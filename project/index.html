@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>どん底井戸太郎 - Live2D風インタラクティブ版</title>
+  <style>
+    :root {
+      --panel-bg: rgba(10, 16, 24, 0.44);
+      --panel-border: rgba(255, 255, 255, 0.14);
+      --text: #eef7ff;
+      --muted: #c9d7e6;
+      --shadow: 0 12px 40px rgba(0, 0, 0, 0.36);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: "Hiragino Sans", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+      color: var(--text);
+      background: #071018;
+    }
+
+    body {
+      background-image: url("haikeido.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    #scene {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+    }
+
+    #world {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    #vignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 32%, rgba(255,255,255,0.13), transparent 18%),
+        radial-gradient(circle at 50% 52%, transparent 20%, rgba(0,0,0,0.34) 100%);
+      mix-blend-mode: screen;
+    }
+
+    #charWrap {
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      will-change: transform;
+      pointer-events: none;
+      filter: drop-shadow(0 16px 22px rgba(0,0,0,0.34));
+      z-index: 5;
+    }
+
+    #charShadow {
+      position: absolute;
+      width: 140px;
+      height: 30px;
+      left: 50%;
+      bottom: 12px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,0,0,0.48), rgba(0,0,0,0.10) 72%, transparent 82%);
+      filter: blur(8px);
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    #char {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 210px;
+      height: 210px;
+      transform: translate(-50%, -50%);
+      transform-origin: center center;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      will-change: transform, filter, opacity;
+      image-rendering: auto;
+    }
+
+    #charWrap.thinking #char {
+      animation: tremble 0.08s infinite alternate;
+    }
+
+    #charWrap.talking #char {
+      animation: talkBob 0.20s ease-in-out infinite alternate;
+    }
+
+    #charWrap.blinking #char {
+      animation: blinkPulse 0.18s ease-in-out 1;
+    }
+
+    @keyframes tremble {
+      from { transform: translate(-50%, -50%) translateX(-2px) rotate(-1.5deg) scale(1.02); }
+      to   { transform: translate(-50%, -50%) translateX(2px) rotate(1.5deg) scale(0.995); }
+    }
+
+    @keyframes talkBob {
+      from { transform: translate(-50%, -49%) scaleY(0.95) scaleX(1.03); }
+      to   { transform: translate(-50%, -51%) scaleY(1.05) scaleX(0.98); }
+    }
+
+    @keyframes blinkPulse {
+      0%   { filter: brightness(1); }
+      50%  { filter: brightness(0.95); }
+      100% { filter: brightness(1); }
+    }
+
+    #bubble {
+      position: absolute;
+      left: 50%;
+      top: -18px;
+      transform: translate(-50%, -100%);
+      min-width: 180px;
+      max-width: min(74vw, 420px);
+      padding: 12px 15px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(250, 253, 255, 0.92);
+      color: #24313f;
+      box-shadow: 0 18px 34px rgba(0,0,0,0.2);
+      font-size: 14px;
+      line-height: 1.55;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    #bubble.show {
+      opacity: 1;
+      transform: translate(-50%, calc(-100% - 6px));
+    }
+
+    #bubble::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -10px;
+      width: 18px;
+      height: 18px;
+      transform: translateX(-50%) rotate(45deg);
+      background: rgba(250, 253, 255, 0.92);
+      border-right: 1px solid rgba(255,255,255,0.16);
+      border-bottom: 1px solid rgba(255,255,255,0.16);
+    }
+
+    #settingsBtn {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 50%;
+      background: rgba(12, 19, 28, 0.55);
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+    }
+
+    #settingsPanel {
+      position: fixed;
+      top: 72px;
+      right: 16px;
+      z-index: 40;
+      width: min(360px, calc(100vw - 32px));
+      padding: 16px;
+      border-radius: 20px;
+      border: 1px solid var(--panel-border);
+      background: rgba(9, 16, 24, 0.78);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      display: none;
+    }
+
+    #settingsPanel.show { display: block; }
+
+    #settingsPanel h2 {
+      margin: 0 0 10px;
+      font-size: 16px;
+    }
+
+    #settingsPanel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .fieldLabel {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    #apiKeyInput {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.09);
+      color: #fff;
+      outline: none;
+      margin-bottom: 10px;
+    }
+
+    .btnRow {
+      display: flex;
+      gap: 10px;
+    }
+
+    .miniBtn {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .miniBtn.primary {
+      background: linear-gradient(135deg, rgba(142,208,255,0.28), rgba(123,242,199,0.22));
+    }
+
+    #composer {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      z-index: 30;
+      width: min(760px, calc(100vw - 24px));
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(12, 18, 26, 0.46);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    #promptInput {
+      width: 100%;
+      min-height: 52px;
+      max-height: 132px;
+      resize: none;
+      padding: 14px 16px;
+      border: 0;
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      border-radius: 16px;
+      outline: none;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    #sendBtn {
+      align-self: stretch;
+      min-width: 108px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 16px;
+      color: #fff;
+      cursor: pointer;
+      font-weight: 700;
+      background: linear-gradient(135deg, rgba(142,208,255,0.78), rgba(123,242,199,0.78));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
+    }
+
+    #sendBtn:disabled {
+      opacity: 0.55;
+      cursor: wait;
+    }
+
+    #status {
+      position: fixed;
+      left: 16px;
+      top: 16px;
+      z-index: 20;
+      max-width: min(420px, calc(100vw - 90px));
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(11, 18, 28, 0.48);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    @media (max-width: 640px) {
+      #charWrap {
+        width: 190px;
+        height: 190px;
+      }
+      #char {
+        width: 170px;
+        height: 170px;
+      }
+      #composer {
+        grid-template-columns: 1fr;
+      }
+      #sendBtn {
+        min-height: 48px;
+      }
+      #bubble {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="scene">
+    <div id="world"></div>
+    <div id="charWrap" aria-hidden="true">
+      <div id="bubble"></div>
+      <div id="charShadow"></div>
+      <img id="char" src="syomen.png" alt="どん底井戸太郎" />
+    </div>
+    <div id="vignette"></div>
+  </div>
+
+  <div id="status">画像は <strong>haikeido.png / syomen.png / migi.png / hidari.png / ue.png / sita.png</strong> をHTMLと同じフォルダに置いてください。右上の⚙️からGemini APIキーを保存すると会話できます。</div>
+
+  <button id="settingsBtn" type="button" aria-label="設定">⚙️</button>
+
+  <div id="settingsPanel" role="dialog" aria-label="API設定">
+    <h2>Gemini API 設定</h2>
+    <p>APIキーは localStorage に保存されます。まず <strong>gemini-2.5-flash</strong> を試し、失敗時は互換モデルに自動フォールバックします。</p>
+    <label class="fieldLabel" for="apiKeyInput">Gemini API Key</label>
+    <input id="apiKeyInput" type="password" placeholder="AIza..." autocomplete="off" />
+    <div class="btnRow">
+      <button class="miniBtn primary" id="saveApiKeyBtn" type="button">保存</button>
+      <button class="miniBtn" id="clearApiKeyBtn" type="button">削除</button>
+    </div>
+  </div>
+
+  <form id="composer">
+    <textarea id="promptInput" rows="1" placeholder="井戸太郎に話しかける…"></textarea>
+    <button id="sendBtn" type="submit">送信</button>
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
+  <script>
+    (() => {
+      const {
+        Engine,
+        Render,
+        Runner,
+        Bodies,
+        Body,
+        Composite,
+        Mouse,
+        MouseConstraint,
+        Events,
+        Vector
+      } = Matter;
+
+      const CONFIG = {
+        bubbleDuration: 14000,
+        model: 'gemini-2.5-flash',
+        fallbackModels: ['gemini-2.0-flash-001', 'gemini-1.5-flash-latest'],
+        storageKey: 'dontoko_idotaro_gemini_api_key',
+        systemInstruction: 'あなたは「どん底井戸太郎」。井戸の底でとことこ歩くもちもちした謎の生き物。口調は「〜なんだな」「〜かもね」。短くネガティブ寄りに答えて。返答は1〜3文、簡潔に。',
+        spriteHoldFrames: 8,
+        blinkIntervalMin: 180,
+        blinkIntervalMax: 420
+      };
+
+      const SPRITES = {
+        front: 'syomen.png',
+        right: 'migi.png',
+        left: 'hidari.png',
+        up: 'ue.png',
+        down: 'sita.png'
+      };
+
+      const scene = document.getElementById('scene');
+      const worldEl = document.getElementById('world');
+      const charWrap = document.getElementById('charWrap');
+      const charEl = document.getElementById('char');
+      const shadowEl = document.getElementById('charShadow');
+      const bubbleEl = document.getElementById('bubble');
+      const statusEl = document.getElementById('status');
+      const settingsBtn = document.getElementById('settingsBtn');
+      const settingsPanel = document.getElementById('settingsPanel');
+      const apiKeyInput = document.getElementById('apiKeyInput');
+      const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
+      const clearApiKeyBtn = document.getElementById('clearApiKeyBtn');
+      const composer = document.getElementById('composer');
+      const promptInput = document.getElementById('promptInput');
+      const sendBtn = document.getElementById('sendBtn');
+
+      let width = window.innerWidth;
+      let height = window.innerHeight;
+      let speakingTimer = null;
+      let walkTick = 0;
+      let jumpCooldown = 0;
+      let dragBody = null;
+      let currentSprite = SPRITES.front;
+      let pendingSprite = SPRITES.front;
+      let spriteStableFrames = 0;
+      let nextBlinkFrames = randomBlinkFrames();
+      let blinkFrames = 0;
+      const chatHistory = [];
+      let moveTarget = null;
+      let manualMoveBoost = 0;
+      let lastPointerDownAt = 0;
+
+      function randomBlinkFrames() {
+        const min = CONFIG.blinkIntervalMin;
+        const max = CONFIG.blinkIntervalMax;
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      const engine = Engine.create();
+      engine.gravity.y = 0.16;
+      engine.gravity.x = 0;
+
+      const render = Render.create({
+        element: worldEl,
+        engine,
+        options: {
+          width,
+          height,
+          wireframes: false,
+          background: 'transparent',
+          pixelRatio: Math.min(window.devicePixelRatio || 1, 2)
+        }
+      });
+      render.canvas.style.pointerEvents = 'none';
+      render.canvas.style.opacity = '0';
+
+      const wallThickness = 180;
+      let boundaries = [];
+
+      function buildWalls() {
+        boundaries.forEach(b => Composite.remove(engine.world, b));
+        boundaries = [
+          Bodies.rectangle(width / 2, height + wallThickness / 2 + 80, width * 2, wallThickness, { isStatic: true }),
+          Bodies.rectangle(width / 2, -wallThickness / 2 - 80, width * 2, wallThickness, { isStatic: true }),
+          Bodies.rectangle(-wallThickness / 2 - 80, height / 2, wallThickness, height * 2, { isStatic: true }),
+          Bodies.rectangle(width + wallThickness / 2 + 80, height / 2, wallThickness, height * 2, { isStatic: true })
+        ];
+        Composite.add(engine.world, boundaries);
+      }
+
+      buildWalls();
+
+      const charBody = Bodies.circle(width / 2, height * 0.52, Math.min(width, height) < 640 ? 48 : 56, {
+        restitution: 0.95,
+        friction: 0.018,
+        frictionAir: 0.03,
+        density: 0.00115,
+        slop: 0.04,
+        render: { visible: false }
+      });
+      Composite.add(engine.world, charBody);
+
+      const mouse = Mouse.create(scene);
+      mouse.pixelRatio = render.options.pixelRatio;
+      const mouseConstraint = MouseConstraint.create(engine, {
+        mouse,
+        constraint: {
+          stiffness: 0.09,
+          angularStiffness: 0.08,
+          render: { visible: false }
+        }
+      });
+      Composite.add(engine.world, mouseConstraint);
+
+      Events.on(mouseConstraint, 'startdrag', (e) => {
+        if (e.body === charBody) {
+          dragBody = e.body;
+          charWrap.classList.remove('talking');
+        }
+      });
+
+      Events.on(mouseConstraint, 'enddrag', () => {
+        dragBody = null;
+      });
+
+      Render.run(render);
+      const runner = Runner.create();
+      Runner.run(runner, engine);
+
+      function clamp(n, min, max) {
+        return Math.max(min, Math.min(max, n));
+      }
+
+      function autoResizeTextarea() {
+        promptInput.style.height = 'auto';
+        promptInput.style.height = Math.min(promptInput.scrollHeight, 132) + 'px';
+      }
+
+      function setStatus(msg) {
+        statusEl.innerHTML = msg;
+      }
+
+      function saveApiKey() {
+        localStorage.setItem(CONFIG.storageKey, apiKeyInput.value.trim());
+        setStatus('🔐 APIキーを保存したんだな。たぶん喋れるかもね。');
+      }
+
+      function clearApiKey() {
+        localStorage.removeItem(CONFIG.storageKey);
+        apiKeyInput.value = '';
+        setStatus('🗑️ APIキーを消したんだな。もう黙るかもね。');
+      }
+
+      function getApiKey() {
+        return localStorage.getItem(CONFIG.storageKey)?.trim() || '';
+      }
+
+      function showBubble(text, duration = CONFIG.bubbleDuration) {
+        bubbleEl.textContent = text;
+        bubbleEl.classList.add('show');
+        charWrap.classList.add('talking');
+        if (speakingTimer) clearTimeout(speakingTimer);
+        speakingTimer = setTimeout(() => {
+          bubbleEl.classList.remove('show');
+          charWrap.classList.remove('talking');
+        }, duration);
+      }
+
+      function startThinking() {
+        charWrap.classList.add('thinking');
+        sendBtn.disabled = true;
+      }
+
+      function stopThinking() {
+        charWrap.classList.remove('thinking');
+        sendBtn.disabled = false;
+      }
+
+      function triggerBlink() {
+        charWrap.classList.add('blinking');
+        setTimeout(() => charWrap.classList.remove('blinking'), 180);
+      }
+
+      function updateSprite() {
+        const vx = charBody.velocity.x;
+        const vy = charBody.velocity.y;
+        const absX = Math.abs(vx);
+        const absY = Math.abs(vy);
+        let next = SPRITES.front;
+
+        if (dragBody) {
+          if (absX > absY) {
+            if (vx > 1.4) next = SPRITES.right;
+            else if (vx < -1.4) next = SPRITES.left;
+          } else {
+            if (vy < -1.4) next = SPRITES.up;
+            else if (vy > 1.4) next = SPRITES.down;
+          }
+        } else {
+          if (absX < 0.55 && absY < 0.55) {
+            next = SPRITES.front;
+          } else if (absY > absX * 1.18) {
+            next = vy < 0 ? SPRITES.up : SPRITES.down;
+          } else if (absX > absY * 0.92) {
+            next = vx > 0 ? SPRITES.right : SPRITES.left;
+          }
+        }
+
+        if (next === pendingSprite) {
+          spriteStableFrames += 1;
+        } else {
+          pendingSprite = next;
+          spriteStableFrames = 0;
+        }
+
+        if (currentSprite !== pendingSprite && spriteStableFrames >= CONFIG.spriteHoldFrames) {
+          currentSprite = pendingSprite;
+          charEl.src = currentSprite;
+        }
+      }
+
+      function updateVisual() {
+        const { x, y } = charBody.position;
+        const vx = charBody.velocity.x;
+        const vy = charBody.velocity.y;
+        const angle = charBody.angle;
+        const idle = Math.abs(vx) < 0.5 && Math.abs(vy) < 0.5;
+        const t = performance.now() * 0.001;
+
+        const scaleSquashX = 1 + clamp(Math.abs(vx) * 0.015, 0, 0.10);
+        const scaleSquashY = 1 - clamp(Math.abs(vx) * 0.008 + Math.abs(vy) * 0.006, 0, 0.10);
+        const tiltY = clamp(vx * 2.2, -14, 14);
+        const tiltX = clamp(-vy * 1.8, -12, 12);
+        const liveSwing = idle ? Math.sin(t * 2.1) * 2.1 : Math.sin(t * 8.0) * clamp(Math.abs(vx) * 0.35, 0, 2.8);
+        const liveLift = idle ? Math.sin(t * 1.9) * 4.5 : Math.sin(t * 8.5) * clamp(Math.abs(vy) * 0.25, 0, 3.5);
+        const rotate = angle * 0.18 + liveSwing * 0.03;
+
+        charWrap.style.left = x + 'px';
+        charWrap.style.top = y + 'px';
+        charWrap.style.transform = `translate(-50%, -50%) rotate(${rotate}rad)`;
+
+        charEl.style.transform = `translate(-50%, calc(-50% + ${liveLift}px)) perspective(900px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) rotate(${liveSwing * 0.35}deg) scaleX(${scaleSquashX}) scaleY(${scaleSquashY})`;
+
+        const shadowScale = clamp(1 - Math.abs(y - height * 0.55) / 800, 0.68, 1.05);
+        const shadowOpacity = clamp(0.82 - Math.abs(vy) * 0.02, 0.34, 0.86);
+        shadowEl.style.transform = `translateX(-50%) scale(${shadowScale})`;
+        shadowEl.style.opacity = shadowOpacity;
+
+        if (!dragBody && idle) {
+          nextBlinkFrames -= 1;
+          if (nextBlinkFrames <= 0) {
+            triggerBlink();
+            nextBlinkFrames = randomBlinkFrames();
+          }
+        }
+
+        updateSprite();
+      }
+
+      function applyCenterFloat() {
+        const target = { x: width * 0.5, y: height * 0.56 };
+        const toCenter = Vector.sub(target, charBody.position);
+        const forceScale = dragBody ? 0.000004 : 0.000013;
+        Body.applyForce(charBody, charBody.position, {
+          x: toCenter.x * forceScale,
+          y: toCenter.y * forceScale - 0.00072
+        });
+      }
+
+      function applyTotokoWalk() {
+        if (dragBody) return;
+
+        walkTick += 0.082;
+        jumpCooldown -= 1;
+
+        const bodyPos = charBody.position;
+        const toTarget = moveTarget ? Vector.sub(moveTarget, bodyPos) : null;
+        const targetDistance = toTarget ? Math.hypot(toTarget.x, toTarget.y) : 0;
+        const hasTarget = !!moveTarget && targetDistance > 18;
+
+        if (moveTarget && targetDistance <= 18) {
+          moveTarget = null;
+          manualMoveBoost = 0;
+        }
+
+        const sway = Math.sin(walkTick) * 0.00078;
+        const drift = Math.sin(walkTick * 0.42 + 0.7) * 0.00038;
+        const breathing = Math.sin(walkTick * 0.5) * 0.00009;
+
+        let targetForceX = 0;
+        let targetForceY = 0;
+
+        if (hasTarget) {
+          const nx = toTarget.x / Math.max(targetDistance, 0.0001);
+          const ny = toTarget.y / Math.max(targetDistance, 0.0001);
+          const speedBoost = clamp(targetDistance / 260, 0.35, 1.0);
+          manualMoveBoost = clamp(manualMoveBoost + 0.025, 0, 1);
+
+          targetForceX = nx * 0.00115 * speedBoost * (0.7 + manualMoveBoost * 0.55);
+          targetForceY = ny * 0.00030 * speedBoost;
+
+          const cadence = Math.sin(walkTick * 2.4);
+          targetForceX += nx * cadence * 0.00033;
+          targetForceY += Math.abs(cadence) * -0.00016;
+
+          if (jumpCooldown <= 0 && targetDistance > 90 && Math.random() < 0.035) {
+            Body.applyForce(charBody, charBody.position, {
+              x: nx * 0.0010,
+              y: -0.014 - Math.random() * 0.003
+            });
+            jumpCooldown = 32 + Math.random() * 18;
+          }
+        } else {
+          manualMoveBoost = clamp(manualMoveBoost - 0.02, 0, 1);
+        }
+
+        Body.applyForce(charBody, charBody.position, {
+          x: sway + drift + targetForceX,
+          y: breathing + targetForceY
+        });
+
+        const nearCenter = Math.abs(charBody.position.x - width * 0.5) < width * 0.34;
+        const gentle = Math.abs(charBody.velocity.y) < 2.1;
+        if (!hasTarget && nearCenter && gentle && jumpCooldown <= 0 && Math.random() < 0.014) {
+          Body.applyForce(charBody, charBody.position, {
+            x: (Math.random() - 0.5) * 0.0011,
+            y: -0.020 - Math.random() * 0.005
+          });
+          jumpCooldown = 58 + Math.random() * 48;
+        }
+      }
+
+      function containCharacter() {
+        const pad = 72;
+        const { x, y } = charBody.position;
+        if (x < pad) {
+          Body.setVelocity(charBody, { x: Math.abs(charBody.velocity.x) * 0.92 + 1.2, y: charBody.velocity.y });
+          if (moveTarget) moveTarget.x = Math.max(moveTarget.x, pad + 20);
+        }
+        if (x > width - pad) {
+          Body.setVelocity(charBody, { x: -Math.abs(charBody.velocity.x) * 0.92 - 1.2, y: charBody.velocity.y });
+          if (moveTarget) moveTarget.x = Math.min(moveTarget.x, width - pad - 20);
+        }
+        if (y < pad) {
+          Body.setVelocity(charBody, { x: charBody.velocity.x, y: Math.abs(charBody.velocity.y) * 0.9 + 0.8 });
+          if (moveTarget) moveTarget.y = Math.max(moveTarget.y, pad + 20);
+        }
+        if (y > height - pad) {
+          Body.setVelocity(charBody, { x: charBody.velocity.x, y: -Math.abs(charBody.velocity.y) * 0.92 - 1.2 });
+          if (moveTarget) moveTarget.y = Math.min(moveTarget.y, height - pad - 20);
+        }
+      }
+
+      Events.on(engine, 'beforeUpdate', () => {
+        applyCenterFloat();
+        applyTotokoWalk();
+        containCharacter();
+      });
+
+      Events.on(engine, 'afterUpdate', () => {
+        updateVisual();
+      });
+
+      async function callGemini(userText) {
+        const apiKey = getApiKey();
+        if (!apiKey) {
+          throw new Error('APIキーが未設定です。右上の⚙️から保存してください。');
+        }
+
+        const contents = [];
+        for (const item of chatHistory.slice(-8)) {
+          contents.push({
+            role: item.role,
+            parts: [{ text: item.text }]
+          });
+        }
+        contents.push({ role: 'user', parts: [{ text: userText }] });
+
+        const modelsToTry = [...new Set([CONFIG.model, ...(CONFIG.fallbackModels || [])])];
+        let lastError = null;
+
+        for (const modelName of modelsToTry) {
+          try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(apiKey)}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                systemInstruction: {
+                  parts: [{ text: CONFIG.systemInstruction }]
+                },
+                contents,
+                generationConfig: {
+                  temperature: 0.9,
+                  topP: 0.95,
+                  topK: 40,
+                  maxOutputTokens: 120
+                }
+              })
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+              const msg = data?.error?.message || 'Gemini APIエラー';
+              lastError = new Error(`${modelName}: ${msg}`);
+              continue;
+            }
+
+            const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('')?.trim();
+            if (!text) {
+              lastError = new Error(`${modelName}: 返答が空っぽなんだな。`);
+              continue;
+            }
+
+            if (CONFIG.model !== modelName) {
+              CONFIG.model = modelName;
+              setStatus(`🔄 利用モデルを ${modelName} に切り替えたんだな。`);
+            }
+            return text;
+          } catch (err) {
+            lastError = err instanceof Error ? err : new Error(String(err));
+          }
+        }
+
+        throw lastError || new Error('利用できるGeminiモデルが見つかりませんでした。');
+      }
+
+      async function handleSend() {
+        const text = promptInput.value.trim();
+        if (!text) return;
+
+        promptInput.value = '';
+        autoResizeTextarea();
+        startThinking();
+        showBubble('……考えてるんだな。', 5000);
+        setStatus('💭 井戸の底で考え込んでいます…');
+
+        try {
+          chatHistory.push({ role: 'user', text });
+          const reply = await callGemini(text);
+          chatHistory.push({ role: 'model', text: reply });
+          showBubble(reply);
+          setStatus('🗨️ 返事したんだな。ちょっと暗いかもね。');
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : 'よく分からない失敗';
+          showBubble(`うまく喋れないんだな… ${msg}`);
+          setStatus(`⚠️ ${msg}`);
+        } finally {
+          stopThinking();
+        }
+      }
+
+      function onResize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        render.canvas.width = width * render.options.pixelRatio;
+        render.canvas.height = height * render.options.pixelRatio;
+        render.canvas.style.width = width + 'px';
+        render.canvas.style.height = height + 'px';
+        render.options.width = width;
+        render.options.height = height;
+        buildWalls();
+        if (moveTarget) {
+          moveTarget.x = clamp(moveTarget.x, 80, width - 80);
+          moveTarget.y = clamp(moveTarget.y, 80, height - 110);
+        }
+      }
+
+      settingsBtn.addEventListener('click', () => {
+        settingsPanel.classList.toggle('show');
+      });
+
+      saveApiKeyBtn.addEventListener('click', saveApiKey);
+      clearApiKeyBtn.addEventListener('click', clearApiKey);
+
+      document.addEventListener('click', (e) => {
+        if (!settingsPanel.contains(e.target) && e.target !== settingsBtn) {
+          settingsPanel.classList.remove('show');
+        }
+      });
+
+      scene.addEventListener('pointerdown', (e) => {
+        lastPointerDownAt = performance.now();
+      });
+
+      scene.addEventListener('pointerup', (e) => {
+        const target = e.target;
+        if (
+          target.closest('#composer') ||
+          target.closest('#settingsPanel') ||
+          target.closest('#settingsBtn')
+        ) {
+          return;
+        }
+
+        const heldMs = performance.now() - lastPointerDownAt;
+        if (dragBody || heldMs > 260) return;
+
+        const rect = scene.getBoundingClientRect();
+        moveTarget = {
+          x: clamp(e.clientX - rect.left, 80, width - 80),
+          y: clamp(e.clientY - rect.top, 90, height - 110)
+        };
+        manualMoveBoost = 0.2;
+        jumpCooldown = Math.min(jumpCooldown, 16);
+        setStatus('👣 そこへ向かって、とことこ歩くんだな。');
+      });
+
+      composer.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await handleSend();
+      });
+
+      promptInput.addEventListener('input', autoResizeTextarea);
+      promptInput.addEventListener('keydown', async (e) => {
+        if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+          e.preventDefault();
+          await handleSend();
+        }
+      });
+
+      window.addEventListener('resize', onResize);
+
+      apiKeyInput.value = getApiKey();
+      autoResizeTextarea();
+      charEl.src = SPRITES.front;
+      showBubble('どん底井戸太郎なんだな。少しだけ喋るかもね。', 7000);
+      setStatus('✅ Live2D風の向き切替版です。クリックした場所へ、とことこ歩きます。');
+    })();
+  </script>
+</body>
+</html>
