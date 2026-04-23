@@ -1,945 +1,472 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>どん底井戸太郎 - Live2D風インタラクティブ版</title>
-  <style>
-    :root {
-      --panel-bg: rgba(10, 16, 24, 0.44);
-      --panel-border: rgba(255, 255, 255, 0.14);
-      --text: #eef7ff;
-      --muted: #c9d7e6;
-      --shadow: 0 12px 40px rgba(0, 0, 0, 0.36);
-    }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>どん底井戸太郎</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;
+  font-family:"Hiragino Sans","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  color:#d8eaff;background:#04060a}
 
-    * { box-sizing: border-box; }
+/* ── 背景 ── */
+#bg{
+  position:fixed;inset:0;z-index:0;
+  background-image:url("haikeido.png");
+  background-size:cover;background-position:center;background-repeat:no-repeat
+}
+#bg-overlay{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 55%, transparent 15%, rgba(2,4,12,0.45) 65%, rgba(0,0,0,0.78) 100%),
+    linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, transparent 18%, transparent 72%, rgba(0,0,0,0.55) 100%)
+}
+/* パーティクル用Canvas */
+#fx-canvas{position:fixed;inset:0;z-index:2;pointer-events:none}
 
-    html, body {
-      margin: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      font-family: "Hiragino Sans", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
-      color: var(--text);
-      background: #071018;
-    }
+/* ── コーナー装飾 ── */
+.corner{position:fixed;z-index:20;width:56px;height:56px;pointer-events:none}
+.corner.tl{top:0;left:0;border-top:1px solid rgba(100,180,255,0.35);border-left:1px solid rgba(100,180,255,0.35)}
+.corner.tr{top:0;right:0;border-top:1px solid rgba(100,180,255,0.35);border-right:1px solid rgba(100,180,255,0.35)}
+.corner.bl{bottom:0;left:0;border-bottom:1px solid rgba(100,180,255,0.35);border-left:1px solid rgba(100,180,255,0.35)}
+.corner.br{bottom:0;right:0;border-bottom:1px solid rgba(100,180,255,0.35);border-right:1px solid rgba(100,180,255,0.35)}
+.corner::before,.corner::after{content:"";position:absolute;background:rgba(100,180,255,0.5)}
+.corner.tl::before{top:12px;left:-1px;width:1px;height:8px}
+.corner.tl::after{top:-1px;left:12px;width:8px;height:1px}
+.corner.tr::before{top:12px;right:-1px;width:1px;height:8px}
+.corner.tr::after{top:-1px;right:12px;width:8px;height:1px}
+.corner.bl::before{bottom:12px;left:-1px;width:1px;height:8px}
+.corner.bl::after{bottom:-1px;left:12px;width:8px;height:1px}
+.corner.br::before{bottom:12px;right:-1px;width:1px;height:8px}
+.corner.br::after{bottom:-1px;right:12px;width:8px;height:1px}
 
-    body {
-      background-image: url("haikeido.png");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
+/* ── 上部バー ── */
+#top-bar{
+  position:fixed;top:0;left:0;right:0;height:54px;z-index:30;
+  display:flex;align-items:center;padding:0 22px;gap:14px;
+  background:linear-gradient(to bottom,rgba(2,6,16,0.88),rgba(2,6,16,0));
+  border-bottom:1px solid rgba(80,160,255,0.1)
+}
+#top-title{font-size:15px;font-weight:700;letter-spacing:0.14em;color:#7dc8ff;text-shadow:0 0 18px rgba(80,180,255,0.55)}
+#top-sub{font-size:10px;color:rgba(140,190,255,0.45);letter-spacing:0.12em}
+.orn{width:22px;height:1px;flex-shrink:0;background:linear-gradient(to right,transparent,rgba(80,160,255,0.5))}
+.orn.r{background:linear-gradient(to left,transparent,rgba(80,160,255,0.5))}
+#mood-wrap{margin-left:auto;display:flex;align-items:center;gap:8px}
+.mdot{width:6px;height:6px;border-radius:50%;background:#3a8aff;box-shadow:0 0 8px rgba(58,138,255,0.9);animation:mpulse 2.4s ease-in-out infinite}
+@keyframes mpulse{0%,100%{opacity:0.4;transform:scale(1)}50%{opacity:1;transform:scale(1.35)}}
+#mood-txt{font-size:11px;color:rgba(120,180,255,0.6);letter-spacing:0.06em}
 
-    #scene {
-      position: fixed;
-      inset: 0;
-      overflow: hidden;
-      touch-action: none;
-      user-select: none;
-    }
+/* ── サイド装飾 ── */
+#side-l{position:fixed;left:14px;top:50%;transform:translateY(-50%);z-index:20;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.sbar{width:2px;border-radius:2px}
+.sbar:nth-child(1){height:64px;background:linear-gradient(to bottom,transparent,rgba(60,130,255,0.5),transparent)}
+.sbar:nth-child(2){height:42px;margin-left:5px;background:linear-gradient(to bottom,transparent,rgba(60,130,255,0.35),transparent)}
+.sbar:nth-child(3){height:80px;margin-left:10px;background:linear-gradient(to bottom,transparent,rgba(60,130,255,0.2),transparent)}
+#side-txt{position:fixed;left:24px;top:50%;transform:translateY(-50%) rotate(-90deg);z-index:20;font-size:9px;letter-spacing:0.22em;color:rgba(80,160,255,0.3);pointer-events:none;white-space:nowrap}
 
-    #world {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-    }
+/* ── キャラクター ── */
+#char-stage{
+  position:fixed;left:50%;top:50%;
+  transform:translate(-50%,-52%);
+  z-index:10;width:260px;height:260px;
+  cursor:pointer
+}
+#char-shadow-el{
+  position:absolute;bottom:4px;left:50%;transform:translateX(-50%);
+  width:140px;height:22px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(0,0,0,0.5),transparent 72%);
+  filter:blur(6px);pointer-events:none
+}
+#char-img{
+  position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:210px;height:210px;
+  object-fit:contain;
+  mix-blend-mode:multiply;
+  pointer-events:none;
+  will-change:transform,filter;
+  image-rendering:auto
+}
 
-    #clickFxLayer {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 12;
-      overflow: hidden;
-    }
+/* ── 吹き出し ── */
+#bubble{
+  position:absolute;left:50%;top:0;
+  transform:translate(-50%,-100%) translateY(-20px);
+  z-index:40;
+  max-width:min(78vw,420px);min-width:160px;
+  padding:12px 16px;border-radius:18px;
+  border:1px solid rgba(100,200,255,0.2);
+  background:rgba(4,10,22,0.86);
+  color:#c8e8ff;font-size:13px;line-height:1.65;
+  pointer-events:none;opacity:0;
+  transition:opacity 200ms ease,transform 200ms ease;
+  backdrop-filter:blur(14px);
+  box-shadow:0 0 30px rgba(40,120,255,0.1),inset 0 1px 0 rgba(255,255,255,0.06)
+}
+#bubble.show{opacity:1;transform:translate(-50%,-100%) translateY(-28px)}
+#bubble::after{
+  content:"";position:absolute;left:50%;bottom:-9px;
+  width:16px;height:16px;transform:translateX(-50%) rotate(45deg);
+  background:rgba(4,10,22,0.86);
+  border-right:1px solid rgba(100,200,255,0.2);
+  border-bottom:1px solid rgba(100,200,255,0.2)
+}
 
-    .click-fx {
-      position: absolute;
-      width: 18px;
-      height: 18px;
-      transform: translate(-50%, -50%);
-      border-radius: 999px;
-      border: 2px solid rgba(255,255,255,0.7);
-      box-shadow: 0 0 0 6px rgba(149, 234, 255, 0.10);
-      animation: clickPulse 620ms ease-out forwards;
-      mix-blend-mode: screen;
-    }
+/* ── クリックエフェクト ── */
+#click-fx{position:fixed;inset:0;z-index:15;pointer-events:none;overflow:hidden}
+.cfx{position:absolute;width:36px;height:36px;border-radius:50%;transform:translate(-50%,-50%);border:1.5px solid rgba(80,180,255,0.85);animation:cfxA 680ms ease-out forwards}
+@keyframes cfxA{0%{opacity:1;transform:translate(-50%,-50%) scale(0.25)}100%{opacity:0;transform:translate(-50%,-50%) scale(4.2)}}
+.cfx2{position:absolute;width:7px;height:7px;border-radius:50%;transform:translate(-50%,-50%);background:rgba(130,210,255,0.95);box-shadow:0 0 10px rgba(80,180,255,0.8);animation:cfxB 380ms ease-out forwards}
+@keyframes cfxB{0%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(0.1) translateY(-18px)}}
 
-    .click-fx::before,
-    .click-fx::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 10px;
-      height: 2px;
-      background: rgba(255,255,255,0.82);
-      border-radius: 999px;
-      transform: translate(-50%, -50%);
-    }
+/* ── 水滴 ── */
+.drop{
+  position:fixed;pointer-events:none;
+  border-radius:50% 50% 60% 40% / 50% 50% 70% 50%;
+  background:rgba(80,160,255,0.15);
+  border:1px solid rgba(100,190,255,0.2);
+  animation:dropA linear forwards
+}
+@keyframes dropA{0%{opacity:0.8;transform:scaleY(1)}100%{opacity:0;transform:scaleY(0.6) translateY(70px)}}
 
-    .click-fx::after {
-      transform: translate(-50%, -50%) rotate(90deg);
-    }
+/* ── ステータス ── */
+#status-line{
+  position:fixed;left:50%;bottom:96px;
+  transform:translateX(-50%);z-index:20;
+  font-size:11px;color:rgba(100,160,255,0.42);
+  letter-spacing:0.08em;pointer-events:none;
+  text-align:center;white-space:nowrap
+}
 
-    @keyframes clickPulse {
-      0% {
-        opacity: 0.95;
-        transform: translate(-50%, -50%) scale(0.45);
-      }
-      55% {
-        opacity: 1;
-      }
-      100% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(4.8);
-      }
-    }
+/* ── 入力エリア ── */
+#composer{
+  position:fixed;bottom:0;left:0;right:0;z-index:30;padding:12px 16px 16px
+}
+#composer-inner{
+  max-width:700px;margin:0 auto;
+  display:grid;grid-template-columns:1fr auto;gap:10px;
+  padding:10px;border-radius:22px;
+  border:1px solid rgba(60,120,255,0.18);
+  background:rgba(3,7,18,0.82);
+  backdrop-filter:blur(22px);
+  box-shadow:0 -4px 40px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.04)
+}
+#prompt-input{
+  border:none;background:rgba(255,255,255,0.05);color:#c8e8ff;
+  border-radius:14px;padding:12px 16px;font-size:14px;line-height:1.5;
+  resize:none;min-height:48px;max-height:120px;outline:none;font-family:inherit
+}
+#prompt-input::placeholder{color:rgba(100,160,255,0.32)}
+#send-btn{
+  align-self:stretch;min-width:86px;padding:0 16px;
+  border:none;border-radius:14px;color:#02060e;font-weight:700;font-size:14px;
+  cursor:pointer;
+  background:linear-gradient(135deg,#5ab0ff,#7eeab0);
+  box-shadow:0 0 20px rgba(80,180,255,0.22);
+  transition:opacity .15s,transform .1s
+}
+#send-btn:hover{opacity:0.87}
+#send-btn:active{transform:scale(0.97)}
+#send-btn:disabled{opacity:0.38;cursor:wait}
 
-    #vignette {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background:
-        radial-gradient(circle at 50% 32%, rgba(255,255,255,0.13), transparent 18%),
-        radial-gradient(circle at 50% 52%, transparent 20%, rgba(0,0,0,0.34) 100%);
-      mix-blend-mode: screen;
-    }
-
-    #charWrap {
-      position: absolute;
-      width: 240px;
-      height: 240px;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      will-change: transform;
-      pointer-events: none;
-      filter: drop-shadow(0 16px 22px rgba(0,0,0,0.34));
-      z-index: 5;
-    }
-
-    #charShadow {
-      position: absolute;
-      width: 140px;
-      height: 30px;
-      left: 50%;
-      bottom: 12px;
-      transform: translateX(-50%);
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,0,0,0.48), rgba(0,0,0,0.10) 72%, transparent 82%);
-      filter: blur(8px);
-      opacity: 0.8;
-      pointer-events: none;
-    }
-
-    #char {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 210px;
-      height: 210px;
-      transform: translate(-50%, -50%);
-      transform-origin: center center;
-      object-fit: contain;
-      mix-blend-mode: multiply;
-      pointer-events: none;
-      will-change: transform, filter, opacity;
-      image-rendering: auto;
-    }
-
-    #charWrap.thinking #char {
-      animation: tremble 0.08s infinite alternate;
-    }
-
-    #charWrap.talking #char {
-      animation: talkBob 0.20s ease-in-out infinite alternate;
-    }
-
-    #charWrap.blinking #char {
-      animation: blinkPulse 0.18s ease-in-out 1;
-    }
-
-    @keyframes tremble {
-      from { transform: translate(-50%, -50%) translateX(-2px) rotate(-1.5deg) scale(1.02); }
-      to   { transform: translate(-50%, -50%) translateX(2px) rotate(1.5deg) scale(0.995); }
-    }
-
-    @keyframes talkBob {
-      from { transform: translate(-50%, -49%) scaleY(0.95) scaleX(1.03); }
-      to   { transform: translate(-50%, -51%) scaleY(1.05) scaleX(0.98); }
-    }
-
-    @keyframes blinkPulse {
-      0%   { filter: brightness(1); }
-      50%  { filter: brightness(0.95); }
-      100% { filter: brightness(1); }
-    }
-
-    #bubble {
-      position: absolute;
-      left: 50%;
-      top: -18px;
-      transform: translate(-50%, -100%);
-      min-width: 180px;
-      max-width: min(74vw, 420px);
-      padding: 12px 15px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(250, 253, 255, 0.92);
-      color: #24313f;
-      box-shadow: 0 18px 34px rgba(0,0,0,0.2);
-      font-size: 14px;
-      line-height: 1.55;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 180ms ease, transform 180ms ease;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-
-    #bubble.show {
-      opacity: 1;
-      transform: translate(-50%, calc(-100% - 6px));
-    }
-
-    #bubble::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      bottom: -10px;
-      width: 18px;
-      height: 18px;
-      transform: translateX(-50%) rotate(45deg);
-      background: rgba(250, 253, 255, 0.92);
-      border-right: 1px solid rgba(255,255,255,0.16);
-      border-bottom: 1px solid rgba(255,255,255,0.16);
-    }
-
-    #settingsBtn {
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      z-index: 30;
-      width: 46px;
-      height: 46px;
-      border: 1px solid rgba(255,255,255,0.14);
-      border-radius: 50%;
-      background: rgba(12, 19, 28, 0.55);
-      color: #fff;
-      font-size: 22px;
-      cursor: pointer;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: var(--shadow);
-    }
-
-    #settingsPanel {
-      position: fixed;
-      top: 72px;
-      right: 16px;
-      z-index: 40;
-      width: min(360px, calc(100vw - 32px));
-      padding: 16px;
-      border-radius: 20px;
-      border: 1px solid var(--panel-border);
-      background: rgba(9, 16, 24, 0.78);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      display: none;
-    }
-
-    #settingsPanel.show { display: block; }
-
-    #settingsPanel h2 {
-      margin: 0 0 10px;
-      font-size: 16px;
-    }
-
-    #settingsPanel p {
-      margin: 0 0 12px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    .fieldLabel {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    #apiKeyInput {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.09);
-      color: #fff;
-      outline: none;
-      margin-bottom: 10px;
-    }
-
-    .btnRow {
-      display: flex;
-      gap: 10px;
-    }
-
-    .miniBtn {
-      flex: 1;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.1);
-      color: #fff;
-      cursor: pointer;
-    }
-
-    .miniBtn.primary {
-      background: linear-gradient(135deg, rgba(142,208,255,0.28), rgba(123,242,199,0.22));
-    }
-
-    #composer {
-      position: fixed;
-      left: 50%;
-      bottom: 18px;
-      z-index: 30;
-      width: min(760px, calc(100vw - 24px));
-      transform: translateX(-50%);
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      padding: 10px;
-      border-radius: 22px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(12, 18, 26, 0.46);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: var(--shadow);
-    }
-
-    #promptInput {
-      width: 100%;
-      min-height: 52px;
-      max-height: 132px;
-      resize: none;
-      padding: 14px 16px;
-      border: 0;
-      background: rgba(255,255,255,0.06);
-      color: #fff;
-      border-radius: 16px;
-      outline: none;
-      font-size: 15px;
-      line-height: 1.5;
-    }
-
-    #sendBtn {
-      align-self: stretch;
-      min-width: 108px;
-      padding: 0 18px;
-      border: 0;
-      border-radius: 16px;
-      color: #fff;
-      cursor: pointer;
-      font-weight: 700;
-      background: linear-gradient(135deg, rgba(142,208,255,0.78), rgba(123,242,199,0.78));
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
-    }
-
-    #sendBtn:disabled {
-      opacity: 0.55;
-      cursor: wait;
-    }
-
-    #status {
-      position: fixed;
-      left: 16px;
-      top: 16px;
-      z-index: 20;
-      max-width: min(420px, calc(100vw - 90px));
-      padding: 10px 12px;
-      border-radius: 14px;
-      background: rgba(11, 18, 28, 0.48);
-      border: 1px solid rgba(255,255,255,0.12);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      font-size: 12px;
-      line-height: 1.45;
-      color: var(--muted);
-    }
-
-    @media (max-width: 640px) {
-      #charWrap {
-        width: 190px;
-        height: 190px;
-      }
-      #char {
-        width: 170px;
-        height: 170px;
-      }
-      #composer {
-        grid-template-columns: 1fr;
-      }
-      #sendBtn {
-        min-height: 48px;
-      }
-      #bubble {
-        font-size: 13px;
-      }
-    }
-  </style>
+@media(max-width:600px){
+  #side-l,#side-txt{display:none}
+  #composer-inner{grid-template-columns:1fr}
+  #send-btn{min-height:46px}
+  #char-img{width:180px;height:180px}
+}
+</style>
 </head>
 <body>
-  <div id="scene">
-    <div id="world"></div>
-    <div id="clickFxLayer"></div>
-    <div id="charWrap" aria-hidden="true">
-      <div id="bubble"></div>
-      <div id="charShadow"></div>
-      <img id="char" src="syomen.png" alt="どん底井戸太郎" />
-    </div>
-    <div id="vignette"></div>
+
+<!-- 背景画像 -->
+<div id="bg"></div>
+<div id="bg-overlay"></div>
+<canvas id="fx-canvas"></canvas>
+
+<!-- コーナー装飾 -->
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<!-- 上部バー -->
+<div id="top-bar">
+  <div class="orn"></div>
+  <div id="top-title">どん底 井戸太郎</div>
+  <div class="orn r"></div>
+  <div id="top-sub">WELL BOTTOM SPIRIT</div>
+  <div id="mood-wrap">
+    <div class="mdot"></div>
+    <div id="mood-txt">ネガティブ中</div>
   </div>
+</div>
 
-  <div id="status">Vercel用フロントです。APIキーはブラウザに置かず、<strong>/api/chat</strong> 経由で会話します。</div>
+<!-- サイド装飾 -->
+<div id="side-l"><div class="sbar"></div><div class="sbar"></div><div class="sbar"></div></div>
+<div id="side-txt">DEPTH : ∞</div>
 
-  <button id="settingsBtn" type="button" aria-label="設定">⚙️</button>
+<!-- キャラクター（syomen.png / migi.png / hidari.png / ue.png / sita.png を使用） -->
+<div id="char-stage">
+  <div id="bubble"></div>
+  <div id="char-shadow-el"></div>
+  <img id="char-img" src="syomen.png" alt="どん底井戸太郎"/>
+</div>
 
-  <div id="settingsPanel" role="dialog" aria-label="設定案内">
-    <h2>Vercel版の案内</h2>
-    <p>このフロントはブラウザにAPIキーを保存しません。<strong>api/chat.js</strong> にサーバー処理を置き、Vercel の Environment Variables に <strong>GEMINI_API_KEY</strong> を設定して使ってください。</p>
-    <div class="btnRow">
-      <button class="miniBtn" id="closeInfoBtn" type="button">閉じる</button>
-    </div>
+<!-- クリックFXレイヤー -->
+<div id="click-fx"></div>
+
+<!-- ステータス -->
+<div id="status-line">クリックすると反応するんだな</div>
+
+<!-- 入力エリア -->
+<div id="composer">
+  <div id="composer-inner">
+    <textarea id="prompt-input" rows="1" placeholder="井戸太郎に話しかける…"></textarea>
+    <button id="send-btn" type="button">送信</button>
   </div>
-
-  <form id="composer">
-    <textarea id="promptInput" rows="1" placeholder="井戸太郎に話しかける…"></textarea>
-    <button id="sendBtn" type="submit">送信</button>
-  </form>
-
-  <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
-  <script>
-    (() => {
-      const {
-        Engine,
-        Render,
-        Runner,
-        Bodies,
-        Body,
-        Composite,
-        Mouse,
-        MouseConstraint,
-        Events,
-        Vector
-      } = Matter;
-
-      const CONFIG = {
-        bubbleDuration: 14000,
-        model: 'gemini-2.5-flash',
-        fallbackModels: ['gemini-2.0-flash-001', 'gemini-1.5-flash-latest'],
-        storageKey: 'dontoko_idotaro_gemini_api_key',
-        systemInstruction: 'あなたは「どん底井戸太郎」。井戸の底でとことこ歩くもちもちした謎の生き物。口調は「〜なんだな」「〜かもね」。短くネガティブ寄りに答えて。返答は1〜3文、簡潔に。',
-        spriteHoldFrames: 3,
-        blinkIntervalMin: 180,
-        blinkIntervalMax: 420
-      };
-
-      const SPRITES = {
-        front: 'syomen.png',
-        right: 'migi.png',
-        left: 'hidari.png',
-        up: 'ue.png',
-        down: 'sita.png'
-      };
-
-      const scene = document.getElementById('scene');
-      const worldEl = document.getElementById('world');
-      const charWrap = document.getElementById('charWrap');
-      const charEl = document.getElementById('char');
-      const shadowEl = document.getElementById('charShadow');
-      const bubbleEl = document.getElementById('bubble');
-      const statusEl = document.getElementById('status');
-      const clickFxLayer = document.getElementById('clickFxLayer');
-      const settingsBtn = document.getElementById('settingsBtn');
-      const settingsPanel = document.getElementById('settingsPanel');
-      const closeInfoBtn = document.getElementById('closeInfoBtn');
-      const composer = document.getElementById('composer');
-      const promptInput = document.getElementById('promptInput');
-      const sendBtn = document.getElementById('sendBtn');
-
-      let width = window.innerWidth;
-      let height = window.innerHeight;
-      let speakingTimer = null;
-      let walkTick = 0;
-      let jumpCooldown = 0;
-      let dragBody = null;
-      let currentSprite = SPRITES.front;
-      let pendingSprite = SPRITES.front;
-      let spriteStableFrames = 0;
-      let nextBlinkFrames = randomBlinkFrames();
-      let blinkFrames = 0;
-      const chatHistory = [];
-      let moveTarget = null;
-      let manualMoveBoost = 0;
-      let lastPointerDownAt = 0;
-
-      function randomBlinkFrames() {
-        const min = CONFIG.blinkIntervalMin;
-        const max = CONFIG.blinkIntervalMax;
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-      }
-
-      const engine = Engine.create();
-      engine.gravity.y = 0.16;
-      engine.gravity.x = 0;
-
-      const render = Render.create({
-        element: worldEl,
-        engine,
-        options: {
-          width,
-          height,
-          wireframes: false,
-          background: 'transparent',
-          pixelRatio: Math.min(window.devicePixelRatio || 1, 2)
-        }
-      });
-      render.canvas.style.pointerEvents = 'none';
-      render.canvas.style.opacity = '0';
-
-      const wallThickness = 180;
-      let boundaries = [];
-
-      function buildWalls() {
-        boundaries.forEach(b => Composite.remove(engine.world, b));
-        boundaries = [
-          Bodies.rectangle(width / 2, height + wallThickness / 2 + 80, width * 2, wallThickness, { isStatic: true }),
-          Bodies.rectangle(width / 2, -wallThickness / 2 - 80, width * 2, wallThickness, { isStatic: true }),
-          Bodies.rectangle(-wallThickness / 2 - 80, height / 2, wallThickness, height * 2, { isStatic: true }),
-          Bodies.rectangle(width + wallThickness / 2 + 80, height / 2, wallThickness, height * 2, { isStatic: true })
-        ];
-        Composite.add(engine.world, boundaries);
-      }
-
-      buildWalls();
-
-      const charBody = Bodies.circle(width / 2, height * 0.52, Math.min(width, height) < 640 ? 48 : 56, {
-        restitution: 0.95,
-        friction: 0.018,
-        frictionAir: 0.03,
-        density: 0.00115,
-        slop: 0.04,
-        render: { visible: false }
-      });
-      Composite.add(engine.world, charBody);
-
-      const mouse = Mouse.create(scene);
-      mouse.pixelRatio = render.options.pixelRatio;
-      const mouseConstraint = MouseConstraint.create(engine, {
-        mouse,
-        constraint: {
-          stiffness: 0.09,
-          angularStiffness: 0.08,
-          render: { visible: false }
-        }
-      });
-      Composite.add(engine.world, mouseConstraint);
-
-      Events.on(mouseConstraint, 'startdrag', (e) => {
-        if (e.body === charBody) {
-          dragBody = e.body;
-          charWrap.classList.remove('talking');
-        }
-      });
-
-      Events.on(mouseConstraint, 'enddrag', () => {
-        dragBody = null;
-      });
-
-      Render.run(render);
-      const runner = Runner.create();
-      Runner.run(runner, engine);
-
-      function clamp(n, min, max) {
-        return Math.max(min, Math.min(max, n));
-      }
-
-      function autoResizeTextarea() {
-        promptInput.style.height = 'auto';
-        promptInput.style.height = Math.min(promptInput.scrollHeight, 132) + 'px';
-      }
-
-      function setStatus(msg) {
-        statusEl.innerHTML = msg;
-      }
-
-      
-
-      function showBubble(text, duration = CONFIG.bubbleDuration) {
-        bubbleEl.textContent = text;
-        bubbleEl.classList.add('show');
-        charWrap.classList.add('talking');
-        if (speakingTimer) clearTimeout(speakingTimer);
-        speakingTimer = setTimeout(() => {
-          bubbleEl.classList.remove('show');
-          charWrap.classList.remove('talking');
-        }, duration);
-      }
-
-      function startThinking() {
-        charWrap.classList.add('thinking');
-        sendBtn.disabled = true;
-      }
-
-      function stopThinking() {
-        charWrap.classList.remove('thinking');
-        sendBtn.disabled = false;
-      }
-
-      function triggerBlink() {
-        charWrap.classList.add('blinking');
-        setTimeout(() => charWrap.classList.remove('blinking'), 180);
-      }
-
-      function spawnClickFx(x, y) {
-        const fx = document.createElement('div');
-        fx.className = 'click-fx';
-        fx.style.left = `${x}px`;
-        fx.style.top = `${y}px`;
-        clickFxLayer.appendChild(fx);
-        setTimeout(() => fx.remove(), 700);
-      }
-
-      function updateSprite() {
-        const vx = charBody.velocity.x;
-        const vy = charBody.velocity.y;
-        const absX = Math.abs(vx);
-        const absY = Math.abs(vy);
-        let next = SPRITES.front;
-
-        if (moveTarget) {
-          const dx = moveTarget.x - charBody.position.x;
-          const dy = moveTarget.y - charBody.position.y;
-          const adx = Math.abs(dx);
-          const ady = Math.abs(dy);
-          const dist = Math.hypot(dx, dy);
-
-          if (dist > 14) {
-            if (ady > adx * 0.8) {
-              next = dy < 0 ? SPRITES.up : SPRITES.down;
-            } else {
-              next = dx > 0 ? SPRITES.right : SPRITES.left;
-            }
-          } else if (absY > absX * 1.05 && absY > 0.45) {
-            next = vy < 0 ? SPRITES.up : SPRITES.down;
-          } else if (absX > 0.45) {
-            next = vx > 0 ? SPRITES.right : SPRITES.left;
-          } else {
-            next = SPRITES.front;
-          }
-        } else if (dragBody) {
-          if (absY > absX * 0.75 && absY > 0.7) {
-            next = vy < 0 ? SPRITES.up : SPRITES.down;
-          } else if (absX > 0.7) {
-            next = vx > 0 ? SPRITES.right : SPRITES.left;
-          } else {
-            next = SPRITES.front;
-          }
-        } else {
-          if (absY > absX * 1.15 && absY > 0.6) {
-            next = vy < 0 ? SPRITES.up : SPRITES.down;
-          } else if (absX > 0.6) {
-            next = vx > 0 ? SPRITES.right : SPRITES.left;
-          } else {
-            next = SPRITES.front;
-          }
-        }
-
-        if (next === pendingSprite) {
-          spriteStableFrames += 1;
-        } else {
-          pendingSprite = next;
-          spriteStableFrames = 0;
-        }
-
-        if (currentSprite !== pendingSprite && spriteStableFrames >= CONFIG.spriteHoldFrames) {
-          currentSprite = pendingSprite;
-          charEl.src = currentSprite;
-        }
-      }
-
-      function updateVisual() {
-        const { x, y } = charBody.position;
-        const vx = charBody.velocity.x;
-        const vy = charBody.velocity.y;
-        const angle = charBody.angle;
-        const idle = Math.abs(vx) < 0.5 && Math.abs(vy) < 0.5;
-        const t = performance.now() * 0.001;
-
-        const scaleSquashX = 1 + clamp(Math.abs(vx) * 0.015, 0, 0.10);
-        const scaleSquashY = 1 - clamp(Math.abs(vx) * 0.008 + Math.abs(vy) * 0.006, 0, 0.10);
-        const tiltY = clamp(vx * 2.2, -14, 14);
-        const tiltX = clamp(-vy * 1.8, -12, 12);
-        const liveSwing = idle ? Math.sin(t * 2.1) * 2.1 : Math.sin(t * 8.0) * clamp(Math.abs(vx) * 0.35, 0, 2.8);
-        const liveLift = idle ? Math.sin(t * 1.9) * 4.5 : Math.sin(t * 8.5) * clamp(Math.abs(vy) * 0.25, 0, 3.5);
-        const rotate = angle * 0.18 + liveSwing * 0.03;
-
-        charWrap.style.left = x + 'px';
-        charWrap.style.top = y + 'px';
-        charWrap.style.transform = `translate(-50%, -50%) rotate(${rotate}rad)`;
-
-        charEl.style.transform = `translate(-50%, calc(-50% + ${liveLift}px)) perspective(900px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) rotate(${liveSwing * 0.35}deg) scaleX(${scaleSquashX}) scaleY(${scaleSquashY})`;
-
-        const shadowScale = clamp(1 - Math.abs(y - height * 0.55) / 800, 0.68, 1.05);
-        const shadowOpacity = clamp(0.82 - Math.abs(vy) * 0.02, 0.34, 0.86);
-        shadowEl.style.transform = `translateX(-50%) scale(${shadowScale})`;
-        shadowEl.style.opacity = shadowOpacity;
-
-        if (!dragBody && idle) {
-          nextBlinkFrames -= 1;
-          if (nextBlinkFrames <= 0) {
-            triggerBlink();
-            nextBlinkFrames = randomBlinkFrames();
-          }
-        }
-
-        updateSprite();
-      }
-
-      function applyCenterFloat() {
-        const target = { x: width * 0.5, y: height * 0.56 };
-        const toCenter = Vector.sub(target, charBody.position);
-        const forceScale = dragBody ? 0.000004 : 0.000013;
-        Body.applyForce(charBody, charBody.position, {
-          x: toCenter.x * forceScale,
-          y: toCenter.y * forceScale - 0.00072
-        });
-      }
-
-      function applyTotokoWalk() {
-        if (dragBody) return;
-
-        walkTick += 0.092;
-        jumpCooldown -= 1;
-
-        const bodyPos = charBody.position;
-        const toTarget = moveTarget ? Vector.sub(moveTarget, bodyPos) : null;
-        const targetDistance = toTarget ? Math.hypot(toTarget.x, toTarget.y) : 0;
-        const hasTarget = !!moveTarget && targetDistance > 12;
-
-        if (moveTarget && targetDistance <= 12) {
-          moveTarget = null;
-          manualMoveBoost = 0;
-        }
-
-        const sway = Math.sin(walkTick) * 0.00062;
-        const drift = Math.sin(walkTick * 0.42 + 0.7) * 0.00024;
-        const breathing = Math.sin(walkTick * 0.5) * 0.00008;
-
-        let targetForceX = 0;
-        let targetForceY = 0;
-
-        if (hasTarget) {
-          const nx = toTarget.x / Math.max(targetDistance, 0.0001);
-          const ny = toTarget.y / Math.max(targetDistance, 0.0001);
-          const speedBoost = clamp(targetDistance / 200, 0.45, 1.25);
-          manualMoveBoost = clamp(manualMoveBoost + 0.05, 0, 1);
-
-          targetForceX = nx * 0.0017 * speedBoost * (0.78 + manualMoveBoost * 0.65);
-          targetForceY = ny * 0.00115 * speedBoost * (0.72 + manualMoveBoost * 0.55);
-
-          const cadence = Math.sin(walkTick * 2.8);
-          targetForceX += nx * cadence * 0.00036;
-          targetForceY += ny * Math.abs(cadence) * 0.00018;
-          targetForceY += Math.abs(cadence) * -0.00014;
-
-          if (jumpCooldown <= 0 && targetDistance > 70 && Math.random() < 0.04) {
-            Body.applyForce(charBody, charBody.position, {
-              x: nx * 0.00115,
-              y: -0.015 - Math.random() * 0.003
-            });
-            jumpCooldown = 26 + Math.random() * 14;
-          }
-        } else {
-          manualMoveBoost = clamp(manualMoveBoost - 0.03, 0, 1);
-        }
-
-        Body.applyForce(charBody, charBody.position, {
-          x: sway + drift + targetForceX,
-          y: breathing + targetForceY
-        });
-
-        const nearCenter = Math.abs(charBody.position.x - width * 0.5) < width * 0.34;
-        const gentle = Math.abs(charBody.velocity.y) < 2.1;
-        if (!hasTarget && nearCenter && gentle && jumpCooldown <= 0 && Math.random() < 0.014) {
-          Body.applyForce(charBody, charBody.position, {
-            x: (Math.random() - 0.5) * 0.0011,
-            y: -0.020 - Math.random() * 0.005
-          });
-          jumpCooldown = 58 + Math.random() * 48;
-        }
-      }
-
-      function containCharacter() {
-        const pad = 72;
-        const { x, y } = charBody.position;
-        if (x < pad) {
-          Body.setVelocity(charBody, { x: Math.abs(charBody.velocity.x) * 0.92 + 1.2, y: charBody.velocity.y });
-          if (moveTarget) moveTarget.x = Math.max(moveTarget.x, pad + 20);
-        }
-        if (x > width - pad) {
-          Body.setVelocity(charBody, { x: -Math.abs(charBody.velocity.x) * 0.92 - 1.2, y: charBody.velocity.y });
-          if (moveTarget) moveTarget.x = Math.min(moveTarget.x, width - pad - 20);
-        }
-        if (y < pad) {
-          Body.setVelocity(charBody, { x: charBody.velocity.x, y: Math.abs(charBody.velocity.y) * 0.9 + 0.8 });
-          if (moveTarget) moveTarget.y = Math.max(moveTarget.y, pad + 20);
-        }
-        if (y > height - pad) {
-          Body.setVelocity(charBody, { x: charBody.velocity.x, y: -Math.abs(charBody.velocity.y) * 0.92 - 1.2 });
-          if (moveTarget) moveTarget.y = Math.min(moveTarget.y, height - pad - 20);
-        }
-      }
-
-      Events.on(engine, 'beforeUpdate', () => {
-        applyCenterFloat();
-        applyTotokoWalk();
-        containCharacter();
-      });
-
-      Events.on(engine, 'afterUpdate', () => {
-        updateVisual();
-      });
-
-      async function callGemini(userText) {
-        const res = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message: userText,
-            history: chatHistory.slice(-8)
-          })
-        });
-
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) {
-          throw new Error(data?.error || 'サーバーとの会話に失敗したんだな。');
-        }
-
-        const text = (data?.reply || '').trim();
-        if (!text) {
-          throw new Error('返答が空っぽなんだな。');
-        }
-        return text;
-      }
-
-      async function handleSend() {
-        const text = promptInput.value.trim();
-        if (!text) return;
-
-        promptInput.value = '';
-        autoResizeTextarea();
-        startThinking();
-        showBubble('……考えてるんだな。', 5000);
-        setStatus('💭 井戸の底で考え込んでいます…');
-
-        try {
-          chatHistory.push({ role: 'user', text });
-          const reply = await callGemini(text);
-          chatHistory.push({ role: 'model', text: reply });
-          showBubble(reply);
-          setStatus('🗨️ 返事したんだな。ちょっと暗いかもね。');
-        } catch (err) {
-          const msg = err instanceof Error ? err.message : 'よく分からない失敗';
-          showBubble(`うまく喋れないんだな… ${msg}`);
-          setStatus(`⚠️ ${msg}`);
-        } finally {
-          stopThinking();
-        }
-      }
-
-      function onResize() {
-        width = window.innerWidth;
-        height = window.innerHeight;
-        render.canvas.width = width * render.options.pixelRatio;
-        render.canvas.height = height * render.options.pixelRatio;
-        render.canvas.style.width = width + 'px';
-        render.canvas.style.height = height + 'px';
-        render.options.width = width;
-        render.options.height = height;
-        buildWalls();
-        if (moveTarget) {
-          moveTarget.x = clamp(moveTarget.x, 80, width - 80);
-          moveTarget.y = clamp(moveTarget.y, 80, height - 110);
-        }
-      }
-
-      settingsBtn.addEventListener('click', () => {
-        settingsPanel.classList.toggle('show');
-      });
-
-      closeInfoBtn.addEventListener('click', () => {
-        settingsPanel.classList.remove('show');
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!settingsPanel.contains(e.target) && e.target !== settingsBtn) {
-          settingsPanel.classList.remove('show');
-        }
-      });
-
-      scene.addEventListener('pointerdown', (e) => {
-        lastPointerDownAt = performance.now();
-      });
-
-      scene.addEventListener('pointerup', (e) => {
-        const target = e.target;
-        if (
-          target.closest('#composer') ||
-          target.closest('#settingsPanel') ||
-          target.closest('#settingsBtn')
-        ) {
-          return;
-        }
-
-        const heldMs = performance.now() - lastPointerDownAt;
-        if (dragBody || heldMs > 260) return;
-
-        const rect = scene.getBoundingClientRect();
-        moveTarget = {
-          x: clamp(e.clientX - rect.left, 80, width - 80),
-          y: clamp(e.clientY - rect.top, 90, height - 110)
-        };
-        spawnClickFx(moveTarget.x, moveTarget.y);
-        manualMoveBoost = 0.2;
-        jumpCooldown = Math.min(jumpCooldown, 16);
-        setStatus('👣 そこへ向かって、とことこ歩くんだな。');
-      });
-
-      composer.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        await handleSend();
-      });
-
-      promptInput.addEventListener('input', autoResizeTextarea);
-      promptInput.addEventListener('keydown', async (e) => {
-        if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
-          e.preventDefault();
-          await handleSend();
-        }
-      });
-
-      window.addEventListener('resize', onResize);
-
-      autoResizeTextarea();
-      charEl.src = SPRITES.front;
-      showBubble('どん底井戸太郎なんだな。少しだけ喋るかもね。', 7000);
-      setStatus('✅ Vercel用フロントです。クリック位置の上下左右を優先して向き、/api/chat 経由で会話します。');
-    })();
-  </script>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(()=>{
+/* ---- 設定 ---- */
+const SPRITES={front:'syomen.png',right:'migi.png',left:'hidari.png',up:'ue.png',down:'sita.png'};
+const MOODS=['ネガティブ中','暗澹とした','どん底気分','ふさいでいる','やる気皆無'];
+const MONOLOGUE=['…静かなんだな。','水の音がするんだな。','暗くて気持ちいいんだな。',
+  '誰も来ないかもね。','底は深いんだな。','ぐしょぐしょしてるんだな。','光が見えないんだな。'];
+const TOUCH_LINES=['いた…ないんだな。','そこは柔らかいんだな。','やめてほしいかもね。',
+  '……なんだな。','ぷよぷよしてるんだな、確かに。','やめろとは言えないんだな。','くすぐったいんだな。'];
+
+/* ---- DOM ---- */
+const charStage  =document.getElementById('char-stage');
+const charImg    =document.getElementById('char-img');
+const charShadow =document.getElementById('char-shadow-el');
+const bubble     =document.getElementById('bubble');
+const clickFxWrap=document.getElementById('click-fx');
+const fxCanvas   =document.getElementById('fx-canvas');
+const statusLine =document.getElementById('status-line');
+const promptInput=document.getElementById('prompt-input');
+const sendBtn    =document.getElementById('send-btn');
+const moodTxt    =document.getElementById('mood-txt');
+
+/* ---- 状態 ---- */
+let bubbleTimer=null, isThinking=false;
+const chatHistory=[];
+let currentSprite=SPRITES.front, pendingSprite=SPRITES.front, spriteHold=0;
+const SPRITE_HOLD=4;
+
+/* ---- パーティクル ---- */
+const ctx=fxCanvas.getContext('2d');
+let cW,cH;
+function resizeCanvas(){ cW=fxCanvas.width=innerWidth; cH=fxCanvas.height=innerHeight; }
+resizeCanvas();
+
+class Particle{
+  constructor(){this.reset(true)}
+  reset(init=false){
+    this.x=Math.random()*cW; this.y=init?Math.random()*cH:cH+12;
+    this.vx=(Math.random()-0.5)*0.1; this.vy=-(0.12+Math.random()*0.38);
+    this.r=0.7+Math.random()*2.0; this.alpha=0.07+Math.random()*0.22;
+    this.life=0; this.maxL=200+Math.random()*320; this.glow=Math.random()<0.3;
+  }
+  tick(){ this.x+=this.vx; this.y+=this.vy; this.life++; if(this.life>this.maxL||this.y<-12)this.reset(); }
+  draw(){
+    const p=this.life/this.maxL;
+    const a=this.alpha*(p<0.15?p/0.15:p>0.82?(1-p)/0.18:1);
+    if(this.glow){
+      const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r*5);
+      g.addColorStop(0,`rgba(70,170,255,${a})`); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(this.x,this.y,this.r*5,0,Math.PI*2); ctx.fill();
+    } else {
+      ctx.fillStyle=`rgba(130,195,255,${a*0.65})`;
+      ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fill();
+    }
+  }
+}
+const particles=Array.from({length:85},()=>new Particle());
+function drawFX(){
+  ctx.clearRect(0,0,cW,cH);
+  particles.forEach(p=>{p.tick();p.draw();});
+  requestAnimationFrame(drawFX);
+}
+drawFX();
+
+/* ---- 水滴 ---- */
+function spawnDrop(){
+  const el=document.createElement('div'); el.className='drop';
+  const size=3+Math.random()*7, dur=1.0+Math.random()*2.2;
+  el.style.cssText=`left:${10+Math.random()*(innerWidth-20)}px;top:-10px;width:${size}px;height:${size*1.5}px;animation-duration:${dur}s`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),dur*1000+300);
+}
+setInterval(spawnDrop,300);
+
+/* ---- GSAP アニメ ---- */
+// 浮遊
+gsap.to(charImg,{y:-10,duration:2.3,ease:'sine.inOut',yoyo:true,repeat:-1});
+// 横揺れ
+gsap.to(charImg,{x:5,rotation:2,duration:3.0,ease:'sine.inOut',yoyo:true,repeat:-1,transformOrigin:'center bottom'});
+// ぷよぷよ
+gsap.to(charImg,{scaleX:1.05,scaleY:0.96,duration:1.6,ease:'elastic.inOut(1,0.5)',yoyo:true,repeat:-1,transformOrigin:'center center'});
+// 影連動
+gsap.to(charShadow,{scaleX:0.88,opacity:0.5,duration:2.3,ease:'sine.inOut',yoyo:true,repeat:-1});
+
+/* ---- スプライト切り替え ---- */
+function switchSprite(name){
+  const src=SPRITES[name]||SPRITES.front;
+  if(charImg.src.endsWith(src)) return;
+  charImg.src=src;
+}
+function updateSpriteByVelocity(vx,vy){
+  let next='front';
+  const ax=Math.abs(vx),ay=Math.abs(vy);
+  if(ay>ax*1.1&&ay>0.5) next=vy<0?'up':'down';
+  else if(ax>0.5) next=vx>0?'right':'left';
+  if(SPRITES[next]===pendingSprite){spriteHold++;}else{pendingSprite=SPRITES[next];spriteHold=0;}
+  if(currentSprite!==pendingSprite&&spriteHold>=SPRITE_HOLD){currentSprite=pendingSprite;charImg.src=currentSprite;}
+}
+
+/* ---- 吹き出し ---- */
+function showBubble(text,dur=10000){
+  bubble.textContent=text; bubble.classList.add('show');
+  if(bubbleTimer)clearTimeout(bubbleTimer);
+  bubbleTimer=setTimeout(()=>bubble.classList.remove('show'),dur);
+}
+
+/* ---- クリックFX ---- */
+function spawnClickFX(x,y){
+  ['cfx','cfx2'].forEach(cls=>{
+    const el=document.createElement('div'); el.className=cls;
+    el.style.left=x+'px'; el.style.top=y+'px';
+    clickFxWrap.appendChild(el);
+    setTimeout(()=>el.remove(),cls==='cfx'?780:450);
+  });
+}
+function spawnBurst(x,y){
+  for(let i=0;i<10;i++){
+    const dot=document.createElement('div');
+    const ang=(i/10)*Math.PI*2, dist=22+Math.random()*35;
+    dot.style.cssText=`position:fixed;width:${3+Math.random()*3|0}px;height:${3+Math.random()*3|0}px;
+      border-radius:50%;left:${x}px;top:${y}px;transform:translate(-50%,-50%);pointer-events:none;z-index:16;
+      background:rgba(${100+Math.random()*80|0},${180+Math.random()*60|0},255,0.88);
+      box-shadow:0 0 8px rgba(80,180,255,0.7)`;
+    document.body.appendChild(dot);
+    gsap.to(dot,{x:Math.cos(ang)*dist,y:Math.sin(ang)*dist,opacity:0,
+      duration:.45+Math.random()*.25,ease:'power2.out',onComplete:()=>dot.remove()});
+  }
+}
+
+/* ---- クリックリアクション ---- */
+function clickReact(ex,ey){
+  spawnClickFX(ex,ey);
+  const r=charStage.getBoundingClientRect();
+  const cx=r.left+r.width/2,cy=r.top+r.height/2;
+  const dx=ex-cx,dy=ey-cy;
+  const dist=Math.hypot(dx,dy);
+  const onChar=dist<115;
+  updateSpriteByVelocity(dx*0.05,dy*0.05);
+  if(onChar){
+    gsap.killTweensOf(charImg,{scaleX:true,scaleY:true});
+    gsap.timeline()
+      .to(charImg,{scaleX:1.22,scaleY:0.80,duration:0.10,ease:'power3.out'})
+      .to(charImg,{scaleX:0.90,scaleY:1.18,duration:0.14,ease:'power2.out'})
+      .to(charImg,{scaleX:1.0,scaleY:1.0,duration:0.65,ease:'elastic.out(1.2,0.4)'});
+    gsap.to(charImg,{x:`+=${dx*0.15}`,y:`+=${dy*0.15}`,duration:0.12,ease:'power2.out',
+      onComplete:()=>gsap.to(charImg,{x:0,y:0,duration:0.8,ease:'elastic.out(1,0.45)'})});
+    spawnBurst(ex,ey);
+    showBubble(TOUCH_LINES[Math.random()*TOUCH_LINES.length|0],4500);
+    moodTxt.textContent=MOODS[Math.random()*MOODS.length|0];
+  } else {
+    gsap.to(charImg,{rotation:dx>0?4:-4,duration:0.25,ease:'power2.out',
+      onComplete:()=>gsap.to(charImg,{rotation:0,duration:1.4,ease:'elastic.out(1,0.5)'})});
+    // 向いた方向のスプライトへ
+    switchSprite(dx>0?'right':'left');
+    setTimeout(()=>switchSprite('front'),600);
+    statusLine.textContent='👣 とことこ向くんだな。';
+  }
+}
+
+/* ---- AI呼び出し ---- */
+async function handleSend(){
+  const text=promptInput.value.trim();
+  if(!text||isThinking) return;
+  promptInput.value=''; autoResize();
+  isThinking=true; sendBtn.disabled=true;
+  showBubble('……考えてるんだな。',8000);
+  statusLine.textContent='💭 どん底で思案中…';
+  switchSprite('front');
+  const shake=gsap.to(charImg,{x:2,duration:0.08,yoyo:true,repeat:-1,ease:'none'});
+  try{
+    chatHistory.push({role:'user',text});
+    const res=await fetch('/api/chat',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:text,history:chatHistory.slice(-8)})
+    });
+    const data=await res.json().catch(()=>({}));
+    if(!res.ok) throw new Error(data?.error||'サーバーエラー');
+    const reply=(data?.reply||'').trim()||'……なんだな。';
+    chatHistory.push({role:'model',text:reply});
+    shake.kill(); gsap.set(charImg,{x:0});
+    showBubble(reply);
+    statusLine.textContent='🌑 返事したんだな。';
+    moodTxt.textContent=MOODS[Math.random()*MOODS.length|0];
+    gsap.to(charImg,{y:-24,duration:0.22,ease:'power2.out',
+      onComplete:()=>gsap.to(charImg,{y:0,duration:0.7,ease:'bounce.out'})});
+    switchSprite('down');
+    setTimeout(()=>switchSprite('front'),800);
+  }catch(err){
+    shake.kill(); gsap.set(charImg,{x:0});
+    switchSprite('front');
+    showBubble(`うまく喋れないんだな… ${err.message}`);
+    statusLine.textContent='⚠ うまくいかないんだな';
+    moodTxt.textContent='困惑中';
+    gsap.to(charImg,{rotation:10,duration:0.15,yoyo:true,repeat:5,ease:'none',
+      onComplete:()=>gsap.set(charImg,{rotation:0})});
+  }finally{
+    isThinking=false; sendBtn.disabled=false;
+  }
+}
+
+function autoResize(){
+  promptInput.style.height='auto';
+  promptInput.style.height=Math.min(promptInput.scrollHeight,120)+'px';
+}
+
+/* ---- まばたき ---- */
+function doBlink(){
+  gsap.timeline()
+    .to(charImg,{scaleY:0.08,duration:0.06,ease:'power2.in'})
+    .to(charImg,{scaleY:1.0,duration:0.1,ease:'power2.out'})
+    .call(()=>setTimeout(doBlink,2200+Math.random()*3800));
+}
+setTimeout(doBlink,2000);
+
+/* ---- イベント ---- */
+document.addEventListener('pointerdown',e=>{
+  if(e.target.closest('#composer')||e.target.closest('#top-bar')) return;
+  clickReact(e.clientX,e.clientY);
+});
+sendBtn.addEventListener('click',handleSend);
+promptInput.addEventListener('input',autoResize);
+promptInput.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();handleSend();}
+});
+window.addEventListener('resize',resizeCanvas);
+
+/* ---- 起動 ---- */
+switchSprite('front');
+setTimeout(()=>showBubble('どん底井戸太郎なんだな。少しだけ喋るかもね。',8000),600);
+statusLine.textContent='✅ クリックで反応。/api/chat 経由で会話します。';
+
+setInterval(()=>{
+  if(!isThinking&&!bubble.classList.contains('show')){
+    showBubble(MONOLOGUE[Math.random()*MONOLOGUE.length|0],5500);
+  }
+},20000);
+
+})();
+</script>
 </body>
 </html>
