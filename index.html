@@ -11,18 +11,13 @@ html,body{width:100%;height:100%;overflow:hidden;
   color:#d8eaff;background:#04060a}
 
 /* ── 背景 ── */
-#bg{
-  position:fixed;inset:0;z-index:0;
-  background-image:url("haikeido.png");
-  background-size:cover;background-position:center;background-repeat:no-repeat
-}
+#bg{position:fixed;inset:0;z-index:0;background-image:url("haikeido.png");background-size:cover;background-position:center;background-repeat:no-repeat}
 #bg-overlay{
   position:fixed;inset:0;z-index:1;pointer-events:none;
   background:
-    radial-gradient(ellipse 90% 70% at 50% 55%, transparent 15%, rgba(2,4,12,0.45) 65%, rgba(0,0,0,0.78) 100%),
-    linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, transparent 18%, transparent 72%, rgba(0,0,0,0.55) 100%)
+    radial-gradient(ellipse 90% 70% at 50% 55%,transparent 15%,rgba(2,4,12,0.45) 65%,rgba(0,0,0,0.78) 100%),
+    linear-gradient(to bottom,rgba(0,0,0,0.65) 0%,transparent 18%,transparent 72%,rgba(0,0,0,0.55) 100%)
 }
-/* パーティクル用Canvas */
 #fx-canvas{position:fixed;inset:0;z-index:2;pointer-events:none}
 
 /* ── コーナー装飾 ── */
@@ -32,14 +27,10 @@ html,body{width:100%;height:100%;overflow:hidden;
 .corner.bl{bottom:0;left:0;border-bottom:1px solid rgba(100,180,255,0.35);border-left:1px solid rgba(100,180,255,0.35)}
 .corner.br{bottom:0;right:0;border-bottom:1px solid rgba(100,180,255,0.35);border-right:1px solid rgba(100,180,255,0.35)}
 .corner::before,.corner::after{content:"";position:absolute;background:rgba(100,180,255,0.5)}
-.corner.tl::before{top:12px;left:-1px;width:1px;height:8px}
-.corner.tl::after{top:-1px;left:12px;width:8px;height:1px}
-.corner.tr::before{top:12px;right:-1px;width:1px;height:8px}
-.corner.tr::after{top:-1px;right:12px;width:8px;height:1px}
-.corner.bl::before{bottom:12px;left:-1px;width:1px;height:8px}
-.corner.bl::after{bottom:-1px;left:12px;width:8px;height:1px}
-.corner.br::before{bottom:12px;right:-1px;width:1px;height:8px}
-.corner.br::after{bottom:-1px;right:12px;width:8px;height:1px}
+.corner.tl::before{top:12px;left:-1px;width:1px;height:8px}.corner.tl::after{top:-1px;left:12px;width:8px;height:1px}
+.corner.tr::before{top:12px;right:-1px;width:1px;height:8px}.corner.tr::after{top:-1px;right:12px;width:8px;height:1px}
+.corner.bl::before{bottom:12px;left:-1px;width:1px;height:8px}.corner.bl::after{bottom:-1px;left:12px;width:8px;height:1px}
+.corner.br::before{bottom:12px;right:-1px;width:1px;height:8px}.corner.br::after{bottom:-1px;right:12px;width:8px;height:1px}
 
 /* ── 上部バー ── */
 #top-bar{
@@ -57,6 +48,16 @@ html,body{width:100%;height:100%;overflow:hidden;
 @keyframes mpulse{0%,100%{opacity:0.4;transform:scale(1)}50%{opacity:1;transform:scale(1.35)}}
 #mood-txt{font-size:11px;color:rgba(120,180,255,0.6);letter-spacing:0.06em}
 
+/* ── 掃除ボタン ── */
+#cleanup-btn{
+  position:fixed;top:14px;right:20px;z-index:35;
+  padding:7px 14px;border-radius:12px;border:1px solid rgba(100,200,255,0.25);
+  background:rgba(6,14,30,0.78);color:#9dd8ff;font-size:12px;
+  letter-spacing:0.08em;cursor:pointer;backdrop-filter:blur(12px);
+  transition:background 0.15s,border-color 0.15s;white-space:nowrap
+}
+#cleanup-btn:hover{background:rgba(20,50,100,0.85);border-color:rgba(100,200,255,0.5)}
+
 /* ── サイド装飾 ── */
 #side-l{position:fixed;left:14px;top:50%;transform:translateY(-50%);z-index:20;display:flex;flex-direction:column;gap:7px;pointer-events:none}
 .sbar{width:2px;border-radius:2px}
@@ -66,41 +67,23 @@ html,body{width:100%;height:100%;overflow:hidden;
 #side-txt{position:fixed;left:24px;top:50%;transform:translateY(-50%) rotate(-90deg);z-index:20;font-size:9px;letter-spacing:0.22em;color:rgba(80,160,255,0.3);pointer-events:none;white-space:nowrap}
 
 /* ── キャラクター ── */
-#char-stage{
-  position:fixed;left:50%;top:50%;
-  transform:translate(-50%,-52%);
-  z-index:10;width:260px;height:260px;
-  cursor:pointer
-}
-#char-shadow-el{
-  position:absolute;bottom:4px;left:50%;transform:translateX(-50%);
-  width:140px;height:22px;border-radius:50%;
-  background:radial-gradient(ellipse,rgba(0,0,0,0.5),transparent 72%);
-  filter:blur(6px);pointer-events:none
-}
+#char-stage{position:fixed;left:50%;top:50%;transform:translate(-50%,-52%);z-index:10;width:260px;height:260px;cursor:pointer}
+#char-shadow-el{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:140px;height:22px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,0.5),transparent 72%);filter:blur(6px);pointer-events:none}
 #char-img{
-  position:absolute;left:50%;top:50%;
-  transform:translate(-50%,-50%);
-  width:210px;height:210px;
-  object-fit:contain;
-  mix-blend-mode:multiply;
-  pointer-events:none;
-  will-change:transform,filter;
-  image-rendering:auto
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:210px;height:210px;object-fit:contain;mix-blend-mode:multiply;
+  pointer-events:none;will-change:transform,filter;image-rendering:auto
 }
 
 /* ── 吹き出し ── */
 #bubble{
   position:absolute;left:50%;top:0;
   transform:translate(-50%,-100%) translateY(-20px);
-  z-index:40;
-  max-width:min(78vw,420px);min-width:160px;
+  z-index:40;max-width:min(78vw,420px);min-width:160px;
   padding:12px 16px;border-radius:18px;
   border:1px solid rgba(100,200,255,0.2);
-  background:rgba(4,10,22,0.86);
-  color:#c8e8ff;font-size:13px;line-height:1.65;
-  pointer-events:none;opacity:0;
-  transition:opacity 200ms ease,transform 200ms ease;
+  background:rgba(4,10,22,0.86);color:#c8e8ff;font-size:13px;line-height:1.65;
+  pointer-events:none;opacity:0;transition:opacity 200ms ease,transform 200ms ease;
   backdrop-filter:blur(14px);
   box-shadow:0 0 30px rgba(40,120,255,0.1),inset 0 1px 0 rgba(255,255,255,0.06)
 }
@@ -109,11 +92,10 @@ html,body{width:100%;height:100%;overflow:hidden;
   content:"";position:absolute;left:50%;bottom:-9px;
   width:16px;height:16px;transform:translateX(-50%) rotate(45deg);
   background:rgba(4,10,22,0.86);
-  border-right:1px solid rgba(100,200,255,0.2);
-  border-bottom:1px solid rgba(100,200,255,0.2)
+  border-right:1px solid rgba(100,200,255,0.2);border-bottom:1px solid rgba(100,200,255,0.2)
 }
 
-/* ── クリックエフェクト ── */
+/* ── クリックFX ── */
 #click-fx{position:fixed;inset:0;z-index:15;pointer-events:none;overflow:hidden}
 .cfx{position:absolute;width:36px;height:36px;border-radius:50%;transform:translate(-50%,-50%);border:1.5px solid rgba(80,180,255,0.85);animation:cfxA 680ms ease-out forwards}
 @keyframes cfxA{0%{opacity:1;transform:translate(-50%,-50%) scale(0.25)}100%{opacity:0;transform:translate(-50%,-50%) scale(4.2)}}
@@ -121,106 +103,135 @@ html,body{width:100%;height:100%;overflow:hidden;
 @keyframes cfxB{0%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(0.1) translateY(-18px)}}
 
 /* ── 水滴 ── */
-.drop{
-  position:fixed;pointer-events:none;
-  border-radius:50% 50% 60% 40% / 50% 50% 70% 50%;
-  background:rgba(80,160,255,0.15);
-  border:1px solid rgba(100,190,255,0.2);
-  animation:dropA linear forwards
-}
+.drop{position:fixed;pointer-events:none;border-radius:50% 50% 60% 40% / 50% 50% 70% 50%;background:rgba(80,160,255,0.15);border:1px solid rgba(100,190,255,0.2);animation:dropA linear forwards}
 @keyframes dropA{0%{opacity:0.8;transform:scaleY(1)}100%{opacity:0;transform:scaleY(0.6) translateY(70px)}}
 
 /* ── ステータス ── */
-#status-line{
-  position:fixed;left:50%;bottom:96px;
-  transform:translateX(-50%);z-index:20;
-  font-size:11px;color:rgba(100,160,255,0.42);
-  letter-spacing:0.08em;pointer-events:none;
-  text-align:center;white-space:nowrap
-}
+#status-line{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:20;font-size:11px;color:rgba(100,160,255,0.42);letter-spacing:0.08em;pointer-events:none;text-align:center;white-space:nowrap}
 
 /* ── 入力エリア ── */
-#composer{
-  position:fixed;bottom:0;left:0;right:0;z-index:30;padding:12px 16px 16px
-}
+#composer{position:fixed;bottom:0;left:0;right:0;z-index:30;padding:12px 16px 16px}
 #composer-inner{
-  max-width:700px;margin:0 auto;
-  display:grid;grid-template-columns:1fr auto;gap:10px;
-  padding:10px;border-radius:22px;
-  border:1px solid rgba(60,120,255,0.18);
-  background:rgba(3,7,18,0.82);
-  backdrop-filter:blur(22px);
+  max-width:700px;margin:0 auto;display:grid;grid-template-columns:1fr auto;gap:10px;
+  padding:10px;border-radius:22px;border:1px solid rgba(60,120,255,0.18);
+  background:rgba(3,7,18,0.82);backdrop-filter:blur(22px);
   box-shadow:0 -4px 40px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.04)
 }
-#prompt-input{
-  border:none;background:rgba(255,255,255,0.05);color:#c8e8ff;
-  border-radius:14px;padding:12px 16px;font-size:14px;line-height:1.5;
-  resize:none;min-height:48px;max-height:120px;outline:none;font-family:inherit
-}
+#prompt-input{border:none;background:rgba(255,255,255,0.05);color:#c8e8ff;border-radius:14px;padding:12px 16px;font-size:14px;line-height:1.5;resize:none;min-height:48px;max-height:120px;outline:none;font-family:inherit}
 #prompt-input::placeholder{color:rgba(100,160,255,0.32)}
-#send-btn{
-  align-self:stretch;min-width:86px;padding:0 16px;
-  border:none;border-radius:14px;color:#02060e;font-weight:700;font-size:14px;
-  cursor:pointer;
-  background:linear-gradient(135deg,#5ab0ff,#7eeab0);
-  box-shadow:0 0 20px rgba(80,180,255,0.22);
-  transition:opacity .15s,transform .1s
-}
+#send-btn{align-self:stretch;min-width:86px;padding:0 16px;border:none;border-radius:14px;color:#02060e;font-weight:700;font-size:14px;cursor:pointer;background:linear-gradient(135deg,#5ab0ff,#7eeab0);box-shadow:0 0 20px rgba(80,180,255,0.22);transition:opacity .15s,transform .1s}
 #send-btn:hover{opacity:0.87}
 #send-btn:active{transform:scale(0.97)}
 #send-btn:disabled{opacity:0.38;cursor:wait}
+
+/* ════════════════════════════════
+   どん底四川省 ゲームオーバーレイ
+════════════════════════════════ */
+#game-overlay{
+  position:fixed;inset:0;z-index:50;
+  background:rgba(1,4,12,0.88);
+  backdrop-filter:blur(18px);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:16px
+}
+#game-overlay.active{display:flex}
+
+#game-header{display:flex;align-items:center;gap:16px;width:100%;max-width:520px;padding:0 4px}
+#game-title{font-size:16px;font-weight:700;letter-spacing:0.1em;color:#7dc8ff}
+#game-moves{font-size:12px;color:rgba(140,190,255,0.6)}
+#game-close{
+  margin-left:auto;padding:6px 14px;border-radius:10px;
+  border:1px solid rgba(100,200,255,0.2);background:rgba(10,20,40,0.7);
+  color:#9dd8ff;font-size:12px;cursor:pointer
+}
+#game-close:hover{background:rgba(20,50,100,0.9)}
+
+#game-board{
+  display:grid;gap:5px;
+  padding:16px;border-radius:18px;
+  border:1px solid rgba(60,120,255,0.2);
+  background:rgba(3,8,20,0.82);
+  box-shadow:0 0 40px rgba(30,80,200,0.1),inset 0 1px 0 rgba(255,255,255,0.04)
+}
+.tile{
+  width:56px;height:56px;border-radius:10px;
+  border:1px solid rgba(80,150,255,0.22);
+  background:rgba(10,22,48,0.75);
+  font-size:26px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:transform 0.12s,background 0.12s,border-color 0.12s;
+  user-select:none;position:relative
+}
+.tile:hover:not(.empty){background:rgba(20,50,100,0.85);border-color:rgba(100,180,255,0.45);transform:scale(1.06)}
+.tile.selected{background:rgba(30,80,180,0.75);border-color:rgba(120,200,255,0.7);box-shadow:0 0 14px rgba(80,160,255,0.45);transform:scale(1.1)}
+.tile.empty{cursor:default;background:rgba(5,10,22,0.4);border-color:rgba(40,80,160,0.1)}
+.tile.flash{animation:tileFlash 0.35s ease-out forwards}
+@keyframes tileFlash{0%{background:rgba(80,200,255,0.55);transform:scale(1.15)}100%{background:rgba(5,10,22,0.4);transform:scale(1)}}
+/* 接続線 */
+#line-canvas{position:absolute;inset:0;pointer-events:none;border-radius:18px}
+
+/* 井戸太郎の小ぼやき（ゲーム中） */
+#taro-game-comment{
+  position:fixed;bottom:80px;left:16px;z-index:55;
+  max-width:200px;padding:9px 12px;border-radius:14px;
+  border:1px solid rgba(80,160,255,0.18);
+  background:rgba(4,10,22,0.82);color:rgba(160,210,255,0.75);
+  font-size:11px;line-height:1.6;pointer-events:none;
+  opacity:0;transition:opacity 300ms
+}
+#taro-game-comment.show{opacity:1}
+#taro-mini-img{position:fixed;bottom:110px;left:16px;z-index:54;width:52px;height:52px;object-fit:contain;mix-blend-mode:multiply;pointer-events:none;opacity:0;transition:opacity 300ms}
+#taro-mini-img.show{opacity:1}
+
+/* ゲームメッセージ */
+#game-msg{
+  font-size:13px;color:rgba(160,220,255,0.65);letter-spacing:0.06em;
+  min-height:20px;text-align:center
+}
+
+/* リセットボタン */
+#game-reset{padding:8px 20px;border-radius:12px;border:1px solid rgba(100,200,255,0.2);background:rgba(10,22,48,0.7);color:#9dd8ff;font-size:12px;cursor:pointer;letter-spacing:0.06em}
+#game-reset:hover{background:rgba(20,50,110,0.9)}
 
 @media(max-width:600px){
   #side-l,#side-txt{display:none}
   #composer-inner{grid-template-columns:1fr}
   #send-btn{min-height:46px}
   #char-img{width:180px;height:180px}
+  .tile{width:46px;height:46px;font-size:22px}
 }
 </style>
 </head>
 <body>
 
-<!-- 背景画像 -->
 <div id="bg"></div>
 <div id="bg-overlay"></div>
 <canvas id="fx-canvas"></canvas>
 
-<!-- コーナー装飾 -->
-<div class="corner tl"></div>
-<div class="corner tr"></div>
-<div class="corner bl"></div>
-<div class="corner br"></div>
+<div class="corner tl"></div><div class="corner tr"></div>
+<div class="corner bl"></div><div class="corner br"></div>
 
-<!-- 上部バー -->
 <div id="top-bar">
   <div class="orn"></div>
   <div id="top-title">どん底 井戸太郎</div>
   <div class="orn r"></div>
   <div id="top-sub">WELL BOTTOM SPIRIT</div>
-  <div id="mood-wrap">
-    <div class="mdot"></div>
-    <div id="mood-txt">ネガティブ中</div>
-  </div>
+  <div id="mood-wrap"><div class="mdot"></div><div id="mood-txt">ネガティブ中</div></div>
 </div>
 
-<!-- サイド装飾 -->
+<button id="cleanup-btn">🧹 掃除（四川省）</button>
+
 <div id="side-l"><div class="sbar"></div><div class="sbar"></div><div class="sbar"></div></div>
 <div id="side-txt">DEPTH : ∞</div>
 
-<!-- キャラクター（syomen.png / migi.png / hidari.png / ue.png / sita.png を使用） -->
 <div id="char-stage">
   <div id="bubble"></div>
   <div id="char-shadow-el"></div>
   <img id="char-img" src="syomen.png" alt="どん底井戸太郎"/>
 </div>
 
-<!-- クリックFXレイヤー -->
 <div id="click-fx"></div>
-
-<!-- ステータス -->
 <div id="status-line">クリックすると反応するんだな</div>
 
-<!-- 入力エリア -->
 <div id="composer">
   <div id="composer-inner">
     <textarea id="prompt-input" rows="1" placeholder="井戸太郎に話しかける…"></textarea>
@@ -228,16 +239,143 @@ html,body{width:100%;height:100%;overflow:hidden;
   </div>
 </div>
 
+<!-- ════ どん底四川省 オーバーレイ ════ -->
+<div id="game-overlay">
+  <div id="game-header">
+    <div id="game-title">🪣 どん底四川省</div>
+    <div id="game-moves">残り手数: <span id="moves-left">30</span></div>
+    <button id="game-reset">リセット</button>
+    <button id="game-close">✕ 閉じる</button>
+  </div>
+  <div id="game-board" style="position:relative">
+    <canvas id="line-canvas"></canvas>
+  </div>
+  <div id="game-msg">同じガラクタを2本以内の線で結んで消すんだな。</div>
+</div>
+<!-- 井戸太郎の小ぼやき -->
+<img id="taro-mini-img" src="syomen.png" alt=""/>
+<div id="taro-game-comment"></div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script>
 (()=>{
-/* ---- 設定 ---- */
+/* ════════════════════════════
+   セリフ 100個
+════════════════════════════ */
+const taroQuotes=[
+"お腹空いたけど、ここは苔しかないんだな。",
+"上からゴミが落ちてきた……僕へのプレゼントかもね。",
+"明るいところは眩しすぎて、目が溶けちゃうんだな。",
+"足元がじめじめしてて、落ち着くんだな。",
+"誰も来ないのが一番いいんだな。",
+"たまにカエルの鳴き声が聞こえる……羨ましいかもね。",
+"僕の体、実は泥でできてるのかもしれないんだな。",
+"太陽なんて、都市伝説だと思ってるんだな。",
+"ここで一生を終えるのも、悪くないかもね。",
+"さっきから見てるけど、暇なんだな。",
+"期待されるのが一番苦手なんだな。",
+"井戸の壁、1万枚目の石を見つけたんだな。",
+"もちもちしてるのは、防御反応かもね。",
+"声をかけられても、何も出ないんだな。",
+"夢も希望も、井戸の隙間に挟まってるんだな。",
+"湿度が100%超えてる気がするんだな。",
+"何かいいこと、あるわけないんだな。",
+"今日も一歩も動いてない……最高かもね。",
+"影と喋るのが一番疲れいないんだな。",
+"僕を外に出そうなんて、思わないでほしいんだな。",
+"肺が苔になりそうなんだな。",
+"頑張るって、どういう意味だったっけ……。",
+"誰かが石を投げた……頭に当たればよかったかもね。",
+"暗闇は友達だけど、たまに無視されるんだな。",
+"井戸の底が、僕の全宇宙なんだな。",
+"思考が停止してる時が、一番幸せかもね。",
+"呼吸するのも面倒になってきたんだな。",
+"昨日の自分と、今日の自分、どっちも消えたいんだな。",
+"バケツが降りてきても、乗らないんだな。",
+"空が丸いって、誰が決めたんだな。",
+"幸せな人の声が、遠くで響いてて不快なんだな。",
+"僕はただの餅の塊なんだな。",
+"掃除はしない。汚れてる方が落ち着くんだな。",
+"根っこが伸びてきた。絡まって動けなくなればいいかもね。",
+"逃げ場所がここしかないんだな。",
+"笑顔の練習、10年前にやめたんだな。",
+"重力がここでは3倍くらいある気がするんだな。",
+"蚊に刺されても、痒がる元気がないんだな。",
+"世界が滅びても、ここは静かだろうな。",
+"足が短いから、逃げ足も遅いんだな。",
+"「大丈夫」って言葉、呪いみたいなんだな。",
+"カビが生えてきた。おしゃれかもね。",
+"誰かに似てる？それは心外なんだな。",
+"下には下がいるっていうけど、僕が最下層なんだな。",
+"井戸水が冷たくて、心が凍りそうなんだな。",
+"喋りすぎた……1年分くらい、エネルギー使ったんだな。",
+"明日が来るのが、一番の恐怖かもね。",
+"どん底って、意外と安定感があるんだな。",
+"僕は役立たずのプロなんだな。",
+"励ましなんて、井戸の底には届かないんだな。",
+"誰かの落としたコインが沈んでる……重そうなんだな。",
+"自分の影が一番の話し相手かもね。",
+"努力は裏切るけど、絶望は裏切らないんだな。",
+"筋肉なんて、もちもちの邪魔なだけなんだな。",
+"立ち上がる理由が見つからないんだな。",
+"井戸の壁に名前を彫ろうとしたけど、すぐ飽きたんだな。",
+"虫が這ってる……くすぐったいけど、そのままにするんだな。",
+"雨が降ると、少しだけ水位が上がる……溺れたらその時かもね。",
+"考えるのをやめると、体が軽くなる気がするんだな。",
+"僕のこと、忘れてくれていいんだな。",
+"100点満点で、マイナス500点くらいで生きてるんだな。",
+"向上心？そんなの、地上に置いてきたんだな。",
+"自分の声が響くのが、たまに怖いんだな。",
+"湿った土の匂い……これが僕の香水なんだな。",
+"変化はいらない。ずっとこのままでいいんだな。",
+"心なんて、最初から持ってないかもね。",
+"「生きてるだけで偉い」とか、聞き飽きたんだな。",
+"僕が消えても、井戸は井戸のままなんだな。",
+"何もしないのが、僕にできる唯一の貢献なんだな。",
+"背中が丸いのは、絶望を背負ってるから……嘘なんだな、元々なんだな。",
+"幸せの基準を、地面より下に設定してるんだな。",
+"孤独は寂しいけど、誰かといるのは苦しいんだな。",
+"僕を拾っても、何もいいことないんだな。",
+"水たまりに映る顔が、ひどくブサイクなんだな。",
+"誰かに褒められたら、逆に不安になるんだな。",
+"明るいニュースなんて、井戸を通り過ぎていくだけなんだな。",
+"感情が、泥みたいにドロドロしてるんだな。",
+"眠るのが、一番の娯楽かもね。",
+"起きた瞬間から、寝る時のこと考えてるんだな。",
+"井戸の底に、もう一人僕がいればいいのに……やっぱり嫌なんだな。",
+"僕の人生、ずっとお通夜みたいなもんなんだな。",
+"誰かが歌ってる……音痴で安心したんだな。",
+"骨が落ちてる。僕の先祖かもね。",
+"鏡を見るのが、世界で一番嫌な仕事なんだな。",
+"進歩がないのが、僕の取り柄なんだな。",
+"夢の中でだけ、空を飛べるんだな。",
+"現実は、いつも湿ってて冷たいんだな。",
+"井戸の外には、もっと怖い怪物がいるはずなんだな。",
+"僕のことは、ただの障害物だと思っていいんだな。",
+"言葉にするのも、疲れるんだな。",
+"期待されるくらいなら、嫌われた方がマシなんだな。",
+"根っこが僕の足を掴んでる。離さないでほしいんだな。",
+"井戸の底には、終わりしかないんだな。",
+"誰かのため、なんて一秒も思えないんだな。",
+"僕はただの、息をしてるだけのゴミかもね。",
+"幸せになりたいなんて、贅沢なんだな。",
+"静寂だけが、僕を裏切らないんだな。",
+"もう、放っておいてほしいんだな。",
+"ああ、また一言喋っちゃった。無駄遣いなんだな。",
+"これで終わり……やっと黙れるんだな。"
+];
+
+const GAME_COMMENTS=[
+"片付けても無駄なんだな…","どうせまた散らかるんだな…",
+"掃除って、誰得なんだな。","疲れた…もうやめたいんだな。",
+"きれいにしても、僕の心は汚れてるんだな。","なんで片付けてるんだろう……。",
+"ガラクタは友達だったんだな。","消えてほしくなかったかもね。"
+];
+
 const SPRITES={front:'syomen.png',right:'migi.png',left:'hidari.png',up:'ue.png',down:'sita.png'};
 const MOODS=['ネガティブ中','暗澹とした','どん底気分','ふさいでいる','やる気皆無'];
 const MONOLOGUE=['…静かなんだな。','水の音がするんだな。','暗くて気持ちいいんだな。',
   '誰も来ないかもね。','底は深いんだな。','ぐしょぐしょしてるんだな。','光が見えないんだな。'];
-const TOUCH_LINES=['いた…ないんだな。','そこは柔らかいんだな。','やめてほしいかもね。',
-  '……なんだな。','ぷよぷよしてるんだな、確かに。','やめろとは言えないんだな。','くすぐったいんだな。'];
 
 /* ---- DOM ---- */
 const charStage  =document.getElementById('char-stage');
@@ -250,6 +388,7 @@ const statusLine =document.getElementById('status-line');
 const promptInput=document.getElementById('prompt-input');
 const sendBtn    =document.getElementById('send-btn');
 const moodTxt    =document.getElementById('mood-txt');
+const cleanupBtn =document.getElementById('cleanup-btn');
 
 /* ---- 状態 ---- */
 let bubbleTimer=null, isThinking=false;
@@ -257,12 +396,13 @@ const chatHistory=[];
 let currentSprite=SPRITES.front, pendingSprite=SPRITES.front, spriteHold=0;
 const SPRITE_HOLD=4;
 
-/* ---- パーティクル ---- */
-const ctx=fxCanvas.getContext('2d');
+/* ══════════════════════════
+   パーティクル背景
+══════════════════════════ */
+const pCtx=fxCanvas.getContext('2d');
 let cW,cH;
 function resizeCanvas(){ cW=fxCanvas.width=innerWidth; cH=fxCanvas.height=innerHeight; }
 resizeCanvas();
-
 class Particle{
   constructor(){this.reset(true)}
   reset(init=false){
@@ -276,24 +416,24 @@ class Particle{
     const p=this.life/this.maxL;
     const a=this.alpha*(p<0.15?p/0.15:p>0.82?(1-p)/0.18:1);
     if(this.glow){
-      const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r*5);
+      const g=pCtx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r*5);
       g.addColorStop(0,`rgba(70,170,255,${a})`); g.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(this.x,this.y,this.r*5,0,Math.PI*2); ctx.fill();
+      pCtx.fillStyle=g; pCtx.beginPath(); pCtx.arc(this.x,this.y,this.r*5,0,Math.PI*2); pCtx.fill();
     } else {
-      ctx.fillStyle=`rgba(130,195,255,${a*0.65})`;
-      ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fill();
+      pCtx.fillStyle=`rgba(130,195,255,${a*0.65})`;
+      pCtx.beginPath(); pCtx.arc(this.x,this.y,this.r,0,Math.PI*2); pCtx.fill();
     }
   }
 }
 const particles=Array.from({length:85},()=>new Particle());
 function drawFX(){
-  ctx.clearRect(0,0,cW,cH);
+  pCtx.clearRect(0,0,cW,cH);
   particles.forEach(p=>{p.tick();p.draw();});
   requestAnimationFrame(drawFX);
 }
 drawFX();
 
-/* ---- 水滴 ---- */
+/* 水滴 */
 function spawnDrop(){
   const el=document.createElement('div'); el.className='drop';
   const size=3+Math.random()*7, dur=1.0+Math.random()*2.2;
@@ -303,20 +443,18 @@ function spawnDrop(){
 }
 setInterval(spawnDrop,300);
 
-/* ---- GSAP アニメ ---- */
-// 浮遊
+/* ══════════════════════════
+   GSAP キャラアニメ
+══════════════════════════ */
 gsap.to(charImg,{y:-10,duration:2.3,ease:'sine.inOut',yoyo:true,repeat:-1});
-// 横揺れ
 gsap.to(charImg,{x:5,rotation:2,duration:3.0,ease:'sine.inOut',yoyo:true,repeat:-1,transformOrigin:'center bottom'});
-// ぷよぷよ
 gsap.to(charImg,{scaleX:1.05,scaleY:0.96,duration:1.6,ease:'elastic.inOut(1,0.5)',yoyo:true,repeat:-1,transformOrigin:'center center'});
-// 影連動
 gsap.to(charShadow,{scaleX:0.88,opacity:0.5,duration:2.3,ease:'sine.inOut',yoyo:true,repeat:-1});
 
-/* ---- スプライト切り替え ---- */
+/* ---- スプライト ---- */
 function switchSprite(name){
   const src=SPRITES[name]||SPRITES.front;
-  if(charImg.src.endsWith(src)) return;
+  if(charImg.getAttribute('src')===src) return;
   charImg.src=src;
 }
 function updateSpriteByVelocity(vx,vy){
@@ -358,12 +496,12 @@ function spawnBurst(x,y){
   }
 }
 
-/* ---- クリックリアクション ---- */
+/* ---- クリックリアクション (taroQuotes を使用) ---- */
 function clickReact(ex,ey){
   spawnClickFX(ex,ey);
   const r=charStage.getBoundingClientRect();
-  const cx=r.left+r.width/2,cy=r.top+r.height/2;
-  const dx=ex-cx,dy=ey-cy;
+  const cx=r.left+r.width/2, cy=r.top+r.height/2;
+  const dx=ex-cx, dy=ey-cy;
   const dist=Math.hypot(dx,dy);
   const onChar=dist<115;
   updateSpriteByVelocity(dx*0.05,dy*0.05);
@@ -376,19 +514,19 @@ function clickReact(ex,ey){
     gsap.to(charImg,{x:`+=${dx*0.15}`,y:`+=${dy*0.15}`,duration:0.12,ease:'power2.out',
       onComplete:()=>gsap.to(charImg,{x:0,y:0,duration:0.8,ease:'elastic.out(1,0.45)'})});
     spawnBurst(ex,ey);
-    showBubble(TOUCH_LINES[Math.random()*TOUCH_LINES.length|0],4500);
+    /* ★ taroQuotes から100個のセリフをランダム表示 */
+    showBubble(taroQuotes[Math.random()*taroQuotes.length|0],5000);
     moodTxt.textContent=MOODS[Math.random()*MOODS.length|0];
   } else {
     gsap.to(charImg,{rotation:dx>0?4:-4,duration:0.25,ease:'power2.out',
       onComplete:()=>gsap.to(charImg,{rotation:0,duration:1.4,ease:'elastic.out(1,0.5)'})});
-    // 向いた方向のスプライトへ
     switchSprite(dx>0?'right':'left');
     setTimeout(()=>switchSprite('front'),600);
     statusLine.textContent='👣 とことこ向くんだな。';
   }
 }
 
-/* ---- AI呼び出し ---- */
+/* ---- AI ---- */
 async function handleSend(){
   const text=promptInput.value.trim();
   if(!text||isThinking) return;
@@ -414,11 +552,9 @@ async function handleSend(){
     moodTxt.textContent=MOODS[Math.random()*MOODS.length|0];
     gsap.to(charImg,{y:-24,duration:0.22,ease:'power2.out',
       onComplete:()=>gsap.to(charImg,{y:0,duration:0.7,ease:'bounce.out'})});
-    switchSprite('down');
-    setTimeout(()=>switchSprite('front'),800);
+    switchSprite('down'); setTimeout(()=>switchSprite('front'),800);
   }catch(err){
-    shake.kill(); gsap.set(charImg,{x:0});
-    switchSprite('front');
+    shake.kill(); gsap.set(charImg,{x:0}); switchSprite('front');
     showBubble(`うまく喋れないんだな… ${err.message}`);
     statusLine.textContent='⚠ うまくいかないんだな';
     moodTxt.textContent='困惑中';
@@ -434,7 +570,7 @@ function autoResize(){
   promptInput.style.height=Math.min(promptInput.scrollHeight,120)+'px';
 }
 
-/* ---- まばたき ---- */
+/* まばたき */
 function doBlink(){
   gsap.timeline()
     .to(charImg,{scaleY:0.08,duration:0.06,ease:'power2.in'})
@@ -443,9 +579,249 @@ function doBlink(){
 }
 setTimeout(doBlink,2000);
 
-/* ---- イベント ---- */
+/* ══════════════════════════════════════
+   どん底四川省 ゲームロジック
+══════════════════════════════════════ */
+const EMOJIS=['🦴','🧱','🍄','👞','📻','🪣','🕳️','🦎','🐛','🕸️','🍂','🔩'];
+const COLS=6, ROWS=4;
+const TOTAL=COLS*ROWS; // 24 → 12種×2ペア
+const gameOverlay  =document.getElementById('game-overlay');
+const gameBoard    =document.getElementById('game-board');
+const lineCanvas   =document.getElementById('line-canvas');
+const gameMsg      =document.getElementById('game-msg');
+const movesLeftEl  =document.getElementById('moves-left');
+const gameResetBtn =document.getElementById('game-reset');
+const gameCloseBtn =document.getElementById('game-close');
+const taroMiniImg  =document.getElementById('taro-mini-img');
+const taroComment  =document.getElementById('taro-game-comment');
+
+const lCtx=lineCanvas.getContext('2d');
+
+let board=[], tiles=[], selected=null, movesLeft=30;
+let gameCommentTimer=null;
+
+/* ボードデータ生成 */
+function generateBoard(){
+  const types=[];
+  // 12種×2 = 24
+  for(let i=0;i<(TOTAL/2);i++) types.push(i%EMOJIS.length,i%EMOJIS.length);
+  // シャッフル
+  for(let i=types.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [types[i],types[j]]=[types[j],types[i]];
+  }
+  board=types.map(t=>({type:t,alive:true}));
+}
+
+/* タイル描画 */
+function renderBoard(){
+  // lineCanvas サイズを board に合わせる
+  const tileSize=62; // 56px + 6px gap
+  lineCanvas.width=COLS*tileSize-6;
+  lineCanvas.height=ROWS*tileSize-6;
+  lCtx.clearRect(0,0,lineCanvas.width,lineCanvas.height);
+
+  // grid style
+  gameBoard.style.gridTemplateColumns=`repeat(${COLS},56px)`;
+
+  // 既存タイルを削除してcanvas以外再生成
+  tiles.forEach(t=>t.remove());
+  tiles=[];
+  board.forEach((cell,idx)=>{
+    const el=document.createElement('div');
+    el.className='tile'+(cell.alive?'':' empty');
+    el.textContent=cell.alive?EMOJIS[cell.type]:'';
+    el.dataset.idx=idx;
+    el.addEventListener('click',()=>onTileClick(idx));
+    gameBoard.appendChild(el);
+    tiles.push(el);
+  });
+}
+
+/* タイル取得ヘルパー */
+function pos(idx){ return {r:Math.floor(idx/COLS), c:idx%COLS}; }
+function idx(r,c){ return r*COLS+c; }
+function isAlive(r,c){ return r>=0&&r<ROWS&&c>=0&&c<COLS&&board[idx(r,c)].alive; }
+
+/* ════ 経路探索（2曲がり以内のL字/I字/Z字型） ════ */
+function canConnect(i1,i2){
+  if(i1===i2) return null;
+  if(board[i1].type!==board[i2].type) return null;
+  const p1=pos(i1), p2=pos(i2);
+
+  // 直線チェック
+  function straight(p,q){
+    if(p.r===q.r){
+      const [minC,maxC]=[Math.min(p.c,q.c),Math.max(p.c,q.c)];
+      for(let c=minC+1;c<maxC;c++) if(isAlive(p.r,c)) return false;
+      return true;
+    }
+    if(p.c===q.c){
+      const [minR,maxR]=[Math.min(p.r,q.r),Math.max(p.r,q.r)];
+      for(let r=minR+1;r<maxR;r++) if(isAlive(r,p.c)) return false;
+      return true;
+    }
+    return false;
+  }
+
+  // 直線
+  if(straight(p1,p2)) return [p1,p2];
+
+  // L字（1曲がり）: (p1.r,p2.c) or (p2.r,p1.c) を経由
+  const corners=[
+    {r:p1.r,c:p2.c},
+    {r:p2.r,c:p1.c}
+  ];
+  for(const m of corners){
+    const mi=idx(m.r,m.c);
+    // 中間点は空きか、対象タイル自身でないなら alive でなければOK
+    if((!board[mi].alive||mi===i1||mi===i2) && straight(p1,m) && straight(m,p2)){
+      return [p1,m,p2];
+    }
+  }
+
+  // Z字（2曲がり）: 行または列を延長してL字2回
+  // 同じ行で間に空きある or 同じ列で延長
+  // 行を経由
+  for(let r=0;r<ROWS;r++){
+    if(r===p1.r||r===p2.r) continue;
+    const m1={r,c:p1.c}, m2={r,c:p2.c};
+    if(isAlive(m1.r,m1.c)||isAlive(m2.r,m2.c)) continue;
+    if(straight(p1,m1)&&straight(m1,m2)&&straight(m2,p2)) return [p1,m1,m2,p2];
+  }
+  // 列を経由
+  for(let c=0;c<COLS;c++){
+    if(c===p1.c||c===p2.c) continue;
+    const m1={r:p1.r,c}, m2={r:p2.r,c};
+    if(isAlive(m1.r,m1.c)||isAlive(m2.r,m2.c)) continue;
+    if(straight(p1,m1)&&straight(m1,m2)&&straight(m2,p2)) return [p1,m1,m2,p2];
+  }
+
+  return null;
+}
+
+/* 線を描く */
+const TILE_W=56, GAP=6, HALF=28;
+function gridToCanvas(p){ return {x:p.c*(TILE_W+GAP)+HALF, y:p.r*(TILE_W+GAP)+HALF}; }
+
+function drawLine(path){
+  lCtx.clearRect(0,0,lineCanvas.width,lineCanvas.height);
+  if(!path||path.length<2) return;
+  lCtx.beginPath();
+  const start=gridToCanvas(path[0]);
+  lCtx.moveTo(start.x,start.y);
+  for(let i=1;i<path.length;i++){
+    const pt=gridToCanvas(path[i]);
+    lCtx.lineTo(pt.x,pt.y);
+  }
+  lCtx.strokeStyle='rgba(100,200,255,0.85)';
+  lCtx.lineWidth=3;
+  lCtx.lineCap='round';
+  lCtx.lineJoin='round';
+  lCtx.shadowColor='rgba(80,180,255,0.6)';
+  lCtx.shadowBlur=8;
+  lCtx.stroke();
+  lCtx.shadowBlur=0;
+}
+
+/* タイルクリック処理 */
+function onTileClick(clickedIdx){
+  if(!board[clickedIdx].alive) return;
+
+  if(selected===null){
+    selected=clickedIdx;
+    tiles[clickedIdx].classList.add('selected');
+    return;
+  }
+  if(selected===clickedIdx){
+    tiles[clickedIdx].classList.remove('selected');
+    selected=null;
+    lCtx.clearRect(0,0,lineCanvas.width,lineCanvas.height);
+    return;
+  }
+
+  const path=canConnect(selected,clickedIdx);
+  if(path){
+    // 消去
+    drawLine(path);
+    const s=selected, c2=clickedIdx;
+    tiles[s].classList.add('flash');
+    tiles[c2].classList.add('flash');
+    setTimeout(()=>{
+      board[s].alive=false; board[c2].alive=false;
+      tiles[s].textContent=''; tiles[s].className='tile empty';
+      tiles[c2].textContent=''; tiles[c2].className='tile empty';
+      lCtx.clearRect(0,0,lineCanvas.width,lineCanvas.height);
+      selected=null;
+      checkWin();
+    },380);
+    movesLeft--;
+    movesLeftEl.textContent=movesLeft;
+    showGameComment();
+    if(movesLeft<=0 && board.some(c=>c.alive)){
+      setTimeout(()=>setGameMsg('手数切れなんだな……。やっぱり無理だったんだな。'),400);
+    }
+  } else {
+    // 繋がらない
+    tiles[selected].classList.remove('selected');
+    tiles[clickedIdx].classList.add('selected');
+    selected=clickedIdx;
+    lCtx.clearRect(0,0,lineCanvas.width,lineCanvas.height);
+    setGameMsg('繋がらないんだな……。');
+    setTimeout(()=>setGameMsg(''),1200);
+  }
+}
+
+function checkWin(){
+  if(!board.some(c=>c.alive)){
+    setGameMsg('全部消えたんだな。……虚しいかもね。');
+    gsap.to(taroMiniImg,{rotation:10,duration:0.15,yoyo:true,repeat:3,ease:'none',onComplete:()=>gsap.set(taroMiniImg,{rotation:0})});
+  }
+}
+
+function setGameMsg(msg){ gameMsg.textContent=msg; }
+
+let commentIdx=0;
+function showGameComment(){
+  const el=taroComment;
+  el.textContent=GAME_COMMENTS[commentIdx%GAME_COMMENTS.length];
+  commentIdx++;
+  el.classList.add('show');
+  taroMiniImg.classList.add('show');
+  if(gameCommentTimer) clearTimeout(gameCommentTimer);
+  gameCommentTimer=setTimeout(()=>{
+    el.classList.remove('show');
+    taroMiniImg.classList.remove('show');
+  },3200);
+}
+
+function startGame(){
+  movesLeft=30; movesLeftEl.textContent=movesLeft; selected=null;
+  lCtx.clearRect(0,0,lineCanvas.width,lineCanvas.height);
+  setGameMsg('同じガラクタを2本以内の線で結んで消すんだな。');
+  generateBoard(); renderBoard();
+}
+
+/* ゲーム開閉 */
+cleanupBtn.addEventListener('click',()=>{
+  gameOverlay.classList.add('active');
+  startGame();
+  showGameComment();
+});
+gameCloseBtn.addEventListener('click',()=>{
+  gameOverlay.classList.remove('active');
+  taroMiniImg.classList.remove('show');
+  taroComment.classList.remove('show');
+  selected=null;
+  lCtx.clearRect(0,0,lineCanvas.width,lineCanvas.height);
+});
+gameResetBtn.addEventListener('click',startGame);
+
+/* ══════════════════════════
+   通常のイベント
+══════════════════════════ */
 document.addEventListener('pointerdown',e=>{
-  if(e.target.closest('#composer')||e.target.closest('#top-bar')) return;
+  if(e.target.closest('#composer')||e.target.closest('#top-bar')||e.target.closest('#game-overlay')) return;
   clickReact(e.clientX,e.clientY);
 });
 sendBtn.addEventListener('click',handleSend);
@@ -455,7 +831,7 @@ promptInput.addEventListener('keydown',e=>{
 });
 window.addEventListener('resize',resizeCanvas);
 
-/* ---- 起動 ---- */
+/* 起動 */
 switchSprite('front');
 setTimeout(()=>showBubble('どん底井戸太郎なんだな。少しだけ喋るかもね。',8000),600);
 statusLine.textContent='✅ クリックで反応。/api/chat 経由で会話します。';
