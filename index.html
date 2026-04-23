@@ -46,6 +46,57 @@
       pointer-events: none;
     }
 
+    #clickFxLayer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 12;
+      overflow: hidden;
+    }
+
+    .click-fx {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      transform: translate(-50%, -50%);
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,0.7);
+      box-shadow: 0 0 0 6px rgba(149, 234, 255, 0.10);
+      animation: clickPulse 620ms ease-out forwards;
+      mix-blend-mode: screen;
+    }
+
+    .click-fx::before,
+    .click-fx::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 10px;
+      height: 2px;
+      background: rgba(255,255,255,0.82);
+      border-radius: 999px;
+      transform: translate(-50%, -50%);
+    }
+
+    .click-fx::after {
+      transform: translate(-50%, -50%) rotate(90deg);
+    }
+
+    @keyframes clickPulse {
+      0% {
+        opacity: 0.95;
+        transform: translate(-50%, -50%) scale(0.45);
+      }
+      55% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(4.8);
+      }
+    }
+
     #vignette {
       position: fixed;
       inset: 0;
@@ -344,6 +395,7 @@
 <body>
   <div id="scene">
     <div id="world"></div>
+    <div id="clickFxLayer"></div>
     <div id="charWrap" aria-hidden="true">
       <div id="bubble"></div>
       <div id="charShadow"></div>
@@ -352,18 +404,15 @@
     <div id="vignette"></div>
   </div>
 
-  <div id="status">画像は <strong>haikeido.png / syomen.png / migi.png / hidari.png / ue.png / sita.png</strong> をHTMLと同じフォルダに置いてください。右上の⚙️からGemini APIキーを保存すると会話できます。</div>
+  <div id="status">Vercel用フロントです。APIキーはブラウザに置かず、<strong>/api/chat</strong> 経由で会話します。</div>
 
   <button id="settingsBtn" type="button" aria-label="設定">⚙️</button>
 
-  <div id="settingsPanel" role="dialog" aria-label="API設定">
-    <h2>Gemini API 設定</h2>
-    <p>APIキーは localStorage に保存されます。まず <strong>gemini-2.5-flash</strong> を試し、失敗時は互換モデルに自動フォールバックします。</p>
-    <label class="fieldLabel" for="apiKeyInput">Gemini API Key</label>
-    <input id="apiKeyInput" type="password" placeholder="AIza..." autocomplete="off" />
+  <div id="settingsPanel" role="dialog" aria-label="設定案内">
+    <h2>Vercel版の案内</h2>
+    <p>このフロントはブラウザにAPIキーを保存しません。<strong>api/chat.js</strong> にサーバー処理を置き、Vercel の Environment Variables に <strong>GEMINI_API_KEY</strong> を設定して使ってください。</p>
     <div class="btnRow">
-      <button class="miniBtn primary" id="saveApiKeyBtn" type="button">保存</button>
-      <button class="miniBtn" id="clearApiKeyBtn" type="button">削除</button>
+      <button class="miniBtn" id="closeInfoBtn" type="button">閉じる</button>
     </div>
   </div>
 
@@ -394,7 +443,7 @@
         fallbackModels: ['gemini-2.0-flash-001', 'gemini-1.5-flash-latest'],
         storageKey: 'dontoko_idotaro_gemini_api_key',
         systemInstruction: 'あなたは「どん底井戸太郎」。井戸の底でとことこ歩くもちもちした謎の生き物。口調は「〜なんだな」「〜かもね」。短くネガティブ寄りに答えて。返答は1〜3文、簡潔に。',
-        spriteHoldFrames: 8,
+        spriteHoldFrames: 3,
         blinkIntervalMin: 180,
         blinkIntervalMax: 420
       };
@@ -414,11 +463,10 @@
       const shadowEl = document.getElementById('charShadow');
       const bubbleEl = document.getElementById('bubble');
       const statusEl = document.getElementById('status');
+      const clickFxLayer = document.getElementById('clickFxLayer');
       const settingsBtn = document.getElementById('settingsBtn');
       const settingsPanel = document.getElementById('settingsPanel');
-      const apiKeyInput = document.getElementById('apiKeyInput');
-      const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
-      const clearApiKeyBtn = document.getElementById('clearApiKeyBtn');
+      const closeInfoBtn = document.getElementById('closeInfoBtn');
       const composer = document.getElementById('composer');
       const promptInput = document.getElementById('promptInput');
       const sendBtn = document.getElementById('sendBtn');
@@ -529,20 +577,7 @@
         statusEl.innerHTML = msg;
       }
 
-      function saveApiKey() {
-        localStorage.setItem(CONFIG.storageKey, apiKeyInput.value.trim());
-        setStatus('🔐 APIキーを保存したんだな。たぶん喋れるかもね。');
-      }
-
-      function clearApiKey() {
-        localStorage.removeItem(CONFIG.storageKey);
-        apiKeyInput.value = '';
-        setStatus('🗑️ APIキーを消したんだな。もう黙るかもね。');
-      }
-
-      function getApiKey() {
-        return localStorage.getItem(CONFIG.storageKey)?.trim() || '';
-      }
+      
 
       function showBubble(text, duration = CONFIG.bubbleDuration) {
         bubbleEl.textContent = text;
@@ -570,6 +605,15 @@
         setTimeout(() => charWrap.classList.remove('blinking'), 180);
       }
 
+      function spawnClickFx(x, y) {
+        const fx = document.createElement('div');
+        fx.className = 'click-fx';
+        fx.style.left = `${x}px`;
+        fx.style.top = `${y}px`;
+        clickFxLayer.appendChild(fx);
+        setTimeout(() => fx.remove(), 700);
+      }
+
       function updateSprite() {
         const vx = charBody.velocity.x;
         const vy = charBody.velocity.y;
@@ -577,21 +621,41 @@
         const absY = Math.abs(vy);
         let next = SPRITES.front;
 
-        if (dragBody) {
-          if (absX > absY) {
-            if (vx > 1.4) next = SPRITES.right;
-            else if (vx < -1.4) next = SPRITES.left;
+        if (moveTarget) {
+          const dx = moveTarget.x - charBody.position.x;
+          const dy = moveTarget.y - charBody.position.y;
+          const adx = Math.abs(dx);
+          const ady = Math.abs(dy);
+          const dist = Math.hypot(dx, dy);
+
+          if (dist > 14) {
+            if (ady > adx * 0.8) {
+              next = dy < 0 ? SPRITES.up : SPRITES.down;
+            } else {
+              next = dx > 0 ? SPRITES.right : SPRITES.left;
+            }
+          } else if (absY > absX * 1.05 && absY > 0.45) {
+            next = vy < 0 ? SPRITES.up : SPRITES.down;
+          } else if (absX > 0.45) {
+            next = vx > 0 ? SPRITES.right : SPRITES.left;
           } else {
-            if (vy < -1.4) next = SPRITES.up;
-            else if (vy > 1.4) next = SPRITES.down;
+            next = SPRITES.front;
+          }
+        } else if (dragBody) {
+          if (absY > absX * 0.75 && absY > 0.7) {
+            next = vy < 0 ? SPRITES.up : SPRITES.down;
+          } else if (absX > 0.7) {
+            next = vx > 0 ? SPRITES.right : SPRITES.left;
+          } else {
+            next = SPRITES.front;
           }
         } else {
-          if (absX < 0.55 && absY < 0.55) {
-            next = SPRITES.front;
-          } else if (absY > absX * 1.18) {
+          if (absY > absX * 1.15 && absY > 0.6) {
             next = vy < 0 ? SPRITES.up : SPRITES.down;
-          } else if (absX > absY * 0.92) {
+          } else if (absX > 0.6) {
             next = vx > 0 ? SPRITES.right : SPRITES.left;
+          } else {
+            next = SPRITES.front;
           }
         }
 
@@ -659,22 +723,22 @@
       function applyTotokoWalk() {
         if (dragBody) return;
 
-        walkTick += 0.082;
+        walkTick += 0.092;
         jumpCooldown -= 1;
 
         const bodyPos = charBody.position;
         const toTarget = moveTarget ? Vector.sub(moveTarget, bodyPos) : null;
         const targetDistance = toTarget ? Math.hypot(toTarget.x, toTarget.y) : 0;
-        const hasTarget = !!moveTarget && targetDistance > 18;
+        const hasTarget = !!moveTarget && targetDistance > 12;
 
-        if (moveTarget && targetDistance <= 18) {
+        if (moveTarget && targetDistance <= 12) {
           moveTarget = null;
           manualMoveBoost = 0;
         }
 
-        const sway = Math.sin(walkTick) * 0.00078;
-        const drift = Math.sin(walkTick * 0.42 + 0.7) * 0.00038;
-        const breathing = Math.sin(walkTick * 0.5) * 0.00009;
+        const sway = Math.sin(walkTick) * 0.00062;
+        const drift = Math.sin(walkTick * 0.42 + 0.7) * 0.00024;
+        const breathing = Math.sin(walkTick * 0.5) * 0.00008;
 
         let targetForceX = 0;
         let targetForceY = 0;
@@ -682,25 +746,26 @@
         if (hasTarget) {
           const nx = toTarget.x / Math.max(targetDistance, 0.0001);
           const ny = toTarget.y / Math.max(targetDistance, 0.0001);
-          const speedBoost = clamp(targetDistance / 260, 0.35, 1.0);
-          manualMoveBoost = clamp(manualMoveBoost + 0.025, 0, 1);
+          const speedBoost = clamp(targetDistance / 200, 0.45, 1.25);
+          manualMoveBoost = clamp(manualMoveBoost + 0.05, 0, 1);
 
-          targetForceX = nx * 0.00115 * speedBoost * (0.7 + manualMoveBoost * 0.55);
-          targetForceY = ny * 0.00030 * speedBoost;
+          targetForceX = nx * 0.0017 * speedBoost * (0.78 + manualMoveBoost * 0.65);
+          targetForceY = ny * 0.00115 * speedBoost * (0.72 + manualMoveBoost * 0.55);
 
-          const cadence = Math.sin(walkTick * 2.4);
-          targetForceX += nx * cadence * 0.00033;
-          targetForceY += Math.abs(cadence) * -0.00016;
+          const cadence = Math.sin(walkTick * 2.8);
+          targetForceX += nx * cadence * 0.00036;
+          targetForceY += ny * Math.abs(cadence) * 0.00018;
+          targetForceY += Math.abs(cadence) * -0.00014;
 
-          if (jumpCooldown <= 0 && targetDistance > 90 && Math.random() < 0.035) {
+          if (jumpCooldown <= 0 && targetDistance > 70 && Math.random() < 0.04) {
             Body.applyForce(charBody, charBody.position, {
-              x: nx * 0.0010,
-              y: -0.014 - Math.random() * 0.003
+              x: nx * 0.00115,
+              y: -0.015 - Math.random() * 0.003
             });
-            jumpCooldown = 32 + Math.random() * 18;
+            jumpCooldown = 26 + Math.random() * 14;
           }
         } else {
-          manualMoveBoost = clamp(manualMoveBoost - 0.02, 0, 1);
+          manualMoveBoost = clamp(manualMoveBoost - 0.03, 0, 1);
         }
 
         Body.applyForce(charBody, charBody.position, {
@@ -751,66 +816,25 @@
       });
 
       async function callGemini(userText) {
-        const apiKey = getApiKey();
-        if (!apiKey) {
-          throw new Error('APIキーが未設定です。右上の⚙️から保存してください。');
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: userText,
+            history: chatHistory.slice(-8)
+          })
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data?.error || 'サーバーとの会話に失敗したんだな。');
         }
 
-        const contents = [];
-        for (const item of chatHistory.slice(-8)) {
-          contents.push({
-            role: item.role,
-            parts: [{ text: item.text }]
-          });
+        const text = (data?.reply || '').trim();
+        if (!text) {
+          throw new Error('返答が空っぽなんだな。');
         }
-        contents.push({ role: 'user', parts: [{ text: userText }] });
-
-        const modelsToTry = [...new Set([CONFIG.model, ...(CONFIG.fallbackModels || [])])];
-        let lastError = null;
-
-        for (const modelName of modelsToTry) {
-          try {
-            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(apiKey)}`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                systemInstruction: {
-                  parts: [{ text: CONFIG.systemInstruction }]
-                },
-                contents,
-                generationConfig: {
-                  temperature: 0.9,
-                  topP: 0.95,
-                  topK: 40,
-                  maxOutputTokens: 120
-                }
-              })
-            });
-
-            const data = await res.json();
-            if (!res.ok) {
-              const msg = data?.error?.message || 'Gemini APIエラー';
-              lastError = new Error(`${modelName}: ${msg}`);
-              continue;
-            }
-
-            const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('')?.trim();
-            if (!text) {
-              lastError = new Error(`${modelName}: 返答が空っぽなんだな。`);
-              continue;
-            }
-
-            if (CONFIG.model !== modelName) {
-              CONFIG.model = modelName;
-              setStatus(`🔄 利用モデルを ${modelName} に切り替えたんだな。`);
-            }
-            return text;
-          } catch (err) {
-            lastError = err instanceof Error ? err : new Error(String(err));
-          }
-        }
-
-        throw lastError || new Error('利用できるGeminiモデルが見つかりませんでした。');
+        return text;
       }
 
       async function handleSend() {
@@ -858,8 +882,9 @@
         settingsPanel.classList.toggle('show');
       });
 
-      saveApiKeyBtn.addEventListener('click', saveApiKey);
-      clearApiKeyBtn.addEventListener('click', clearApiKey);
+      closeInfoBtn.addEventListener('click', () => {
+        settingsPanel.classList.remove('show');
+      });
 
       document.addEventListener('click', (e) => {
         if (!settingsPanel.contains(e.target) && e.target !== settingsBtn) {
@@ -889,6 +914,7 @@
           x: clamp(e.clientX - rect.left, 80, width - 80),
           y: clamp(e.clientY - rect.top, 90, height - 110)
         };
+        spawnClickFx(moveTarget.x, moveTarget.y);
         manualMoveBoost = 0.2;
         jumpCooldown = Math.min(jumpCooldown, 16);
         setStatus('👣 そこへ向かって、とことこ歩くんだな。');
@@ -909,11 +935,10 @@
 
       window.addEventListener('resize', onResize);
 
-      apiKeyInput.value = getApiKey();
       autoResizeTextarea();
       charEl.src = SPRITES.front;
       showBubble('どん底井戸太郎なんだな。少しだけ喋るかもね。', 7000);
-      setStatus('✅ Live2D風の向き切替版です。クリックした場所へ、とことこ歩きます。');
+      setStatus('✅ Vercel用フロントです。クリック位置の上下左右を優先して向き、/api/chat 経由で会話します。');
     })();
   </script>
 </body>
