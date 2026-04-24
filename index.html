@@ -6,17 +6,12 @@
 <title>どん底井戸太郎</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;overflow:hidden;
-  font-family:"Hiragino Sans","Yu Gothic UI","Meiryo",system-ui,sans-serif;
-  color:#d8eaff;background:#04060a}
+html,body{width:100%;height:100%;overflow:hidden;font-family:"Hiragino Sans","Yu Gothic UI","Meiryo",system-ui,sans-serif;color:#d8eaff;background:#04060a}
 
-#bg{position:fixed;inset:0;z-index:0;background-image:url("haikeido.png");background-size:cover;background-position:center;background-repeat:no-repeat}
-#bg-overlay{
-  position:fixed;inset:0;z-index:1;pointer-events:none;
-  background:
-    radial-gradient(ellipse 90% 70% at 50% 55%,transparent 15%,rgba(2,4,12,0.45) 65%,rgba(0,0,0,0.78) 100%),
-    linear-gradient(to bottom,rgba(0,0,0,0.65) 0%,transparent 18%,transparent 72%,rgba(0,0,0,0.55) 100%)
-}
+#bg{position:fixed;inset:0;z-index:0;background-image:url("haikeido.png");background-size:cover;background-position:center}
+#bg-overlay{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse 90% 70% at 50% 55%,transparent 15%,rgba(2,4,12,0.45) 65%,rgba(0,0,0,0.78) 100%),
+  linear-gradient(to bottom,rgba(0,0,0,0.65) 0%,transparent 18%,transparent 72%,rgba(0,0,0,0.55) 100%)}
 #fx-canvas{position:fixed;inset:0;z-index:2;pointer-events:none}
 
 /* コーナー */
@@ -32,12 +27,7 @@ html,body{width:100%;height:100%;overflow:hidden;
 .corner.br::before{bottom:12px;right:-1px;width:1px;height:8px}.corner.br::after{bottom:-1px;right:12px;width:8px;height:1px}
 
 /* 上部バー */
-#top-bar{
-  position:fixed;top:0;left:0;right:0;height:54px;z-index:30;
-  display:flex;align-items:center;padding:0 22px;gap:14px;
-  background:linear-gradient(to bottom,rgba(2,6,16,0.88),rgba(2,6,16,0));
-  border-bottom:1px solid rgba(80,160,255,0.1)
-}
+#top-bar{position:fixed;top:0;left:0;right:0;height:54px;z-index:30;display:flex;align-items:center;padding:0 22px;gap:14px;background:linear-gradient(to bottom,rgba(2,6,16,0.88),rgba(2,6,16,0));border-bottom:1px solid rgba(80,160,255,0.1)}
 #top-title{font-size:15px;font-weight:700;letter-spacing:0.14em;color:#7dc8ff;text-shadow:0 0 18px rgba(80,180,255,0.55)}
 #top-sub{font-size:10px;color:rgba(140,190,255,0.45);letter-spacing:0.12em}
 .orn{width:22px;height:1px;flex-shrink:0;background:linear-gradient(to right,transparent,rgba(80,160,255,0.5))}
@@ -47,17 +37,12 @@ html,body{width:100%;height:100%;overflow:hidden;
 @keyframes mpulse{0%,100%{opacity:0.4;transform:scale(1)}50%{opacity:1;transform:scale(1.35)}}
 #mood-txt{font-size:11px;color:rgba(120,180,255,0.6);letter-spacing:0.06em}
 
-/* 掃除ボタン */
-#cleanup-btn{
-  position:fixed;top:14px;right:20px;z-index:35;
-  padding:7px 14px;border-radius:12px;border:1px solid rgba(100,200,255,0.25);
-  background:rgba(6,14,30,0.78);color:#9dd8ff;font-size:12px;
-  letter-spacing:0.08em;cursor:pointer;backdrop-filter:blur(12px);
-  transition:background 0.15s,border-color 0.15s;white-space:nowrap
-}
-#cleanup-btn:hover{background:rgba(20,50,100,0.85);border-color:rgba(100,200,255,0.5)}
+/* ゲームメニューボタン群 */
+#game-menu{position:fixed;top:14px;right:20px;z-index:35;display:flex;gap:7px}
+.gmenu-btn{padding:6px 12px;border-radius:11px;border:1px solid rgba(100,200,255,0.22);background:rgba(6,14,30,0.78);color:#9dd8ff;font-size:11px;cursor:pointer;backdrop-filter:blur(12px);transition:background .15s;white-space:nowrap}
+.gmenu-btn:hover{background:rgba(20,50,100,0.85)}
 
-/* サイド装飾 */
+/* サイド */
 #side-l{position:fixed;left:14px;top:50%;transform:translateY(-50%);z-index:20;display:flex;flex-direction:column;gap:7px;pointer-events:none}
 .sbar{width:2px;border-radius:2px}
 .sbar:nth-child(1){height:64px;background:linear-gradient(to bottom,transparent,rgba(60,130,255,0.5),transparent)}
@@ -65,66 +50,20 @@ html,body{width:100%;height:100%;overflow:hidden;
 .sbar:nth-child(3){height:80px;margin-left:10px;background:linear-gradient(to bottom,transparent,rgba(60,130,255,0.2),transparent)}
 #side-txt{position:fixed;left:24px;top:50%;transform:translateY(-50%) rotate(-90deg);z-index:20;font-size:9px;letter-spacing:0.22em;color:rgba(80,160,255,0.3);pointer-events:none;white-space:nowrap}
 
-/* ── キャラクター ── */
-#char-wrap{
-  position:fixed;width:240px;height:240px;z-index:10;
-  pointer-events:none;will-change:transform;
-  filter:drop-shadow(0 12px 18px rgba(0,0,0,0.38))
-}
-#char-shadow-el{
-  position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
-  width:130px;height:20px;border-radius:50%;
-  background:radial-gradient(ellipse,rgba(0,0,0,0.48),transparent 72%);
-  filter:blur(6px);pointer-events:none
-}
-/* クロスフェード用：img2枚を重ねる */
-#char-img-a,#char-img-b{
-  position:absolute;left:50%;top:50%;
-  transform:translate(-50%,-50%);
-  width:200px;height:200px;object-fit:contain;
-  mix-blend-mode:multiply;pointer-events:none;
-  will-change:transform,opacity;image-rendering:auto;
-  transition:none
-}
+/* キャラクター */
+#char-wrap{position:fixed;width:240px;height:240px;z-index:10;pointer-events:none;will-change:transform;filter:drop-shadow(0 12px 18px rgba(0,0,0,0.38))}
+#char-shadow-el{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:130px;height:20px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,0.48),transparent 72%);filter:blur(6px);pointer-events:none}
+#char-img-a,#char-img-b{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:200px;height:200px;object-fit:contain;mix-blend-mode:multiply;pointer-events:none;will-change:transform,opacity;image-rendering:auto}
 #char-img-b{opacity:0}
-
-/* 睡眠中ZZZ浮遊 */
-#zzz-fx{
-  position:absolute;left:60%;top:10%;
-  font-size:22px;pointer-events:none;opacity:0;
-  z-index:11;text-shadow:0 0 10px rgba(120,180,255,0.6)
-}
+#char-click-zone{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:180px;height:180px;border-radius:50%;cursor:pointer;z-index:11;background:transparent}
+#zzz-fx{position:absolute;left:62%;top:8%;font-size:20px;pointer-events:none;opacity:0;z-index:12;text-shadow:0 0 10px rgba(120,180,255,0.6)}
+#action-badge{position:fixed;left:50%;top:62px;transform:translateX(-50%);z-index:25;padding:5px 14px;border-radius:20px;border:1px solid rgba(100,200,255,0.18);background:rgba(4,10,22,0.72);color:rgba(160,220,255,0.75);font-size:11px;letter-spacing:0.08em;pointer-events:none;backdrop-filter:blur(10px);opacity:0;transition:opacity .4s}
+#action-badge.show{opacity:1}
 
 /* 吹き出し */
-#bubble{
-  position:absolute;left:50%;top:-10px;
-  transform:translate(-50%,-100%) translateY(0px);
-  z-index:40;max-width:min(72vw,380px);min-width:140px;
-  padding:11px 15px;border-radius:16px;
-  border:1px solid rgba(100,200,255,0.2);
-  background:rgba(4,10,22,0.88);color:#c8e8ff;font-size:13px;line-height:1.65;
-  pointer-events:none;opacity:0;transition:opacity 200ms ease,transform 200ms ease;
-  backdrop-filter:blur(14px);
-  box-shadow:0 0 28px rgba(40,120,255,0.1),inset 0 1px 0 rgba(255,255,255,0.06)
-}
+#bubble{position:absolute;left:50%;top:-10px;transform:translate(-50%,-100%) translateY(0px);z-index:40;max-width:min(72vw,380px);min-width:140px;padding:11px 15px;border-radius:16px;border:1px solid rgba(100,200,255,0.2);background:rgba(4,10,22,0.88);color:#c8e8ff;font-size:13px;line-height:1.65;pointer-events:none;opacity:0;transition:opacity 200ms ease,transform 200ms ease;backdrop-filter:blur(14px);box-shadow:0 0 28px rgba(40,120,255,0.1),inset 0 1px 0 rgba(255,255,255,0.06)}
 #bubble.show{opacity:1;transform:translate(-50%,-100%) translateY(-10px)}
-#bubble::after{
-  content:"";position:absolute;left:50%;bottom:-9px;
-  width:16px;height:16px;transform:translateX(-50%) rotate(45deg);
-  background:rgba(4,10,22,0.88);
-  border-right:1px solid rgba(100,200,255,0.2);border-bottom:1px solid rgba(100,200,255,0.2)
-}
-
-/* 行動ステータスバッジ */
-#action-badge{
-  position:fixed;left:50%;top:62px;transform:translateX(-50%);
-  z-index:25;padding:5px 14px;border-radius:20px;
-  border:1px solid rgba(100,200,255,0.18);
-  background:rgba(4,10,22,0.72);color:rgba(160,220,255,0.75);
-  font-size:11px;letter-spacing:0.08em;pointer-events:none;
-  backdrop-filter:blur(10px);opacity:0;transition:opacity 0.4s
-}
-#action-badge.show{opacity:1}
+#bubble::after{content:"";position:absolute;left:50%;bottom:-9px;width:16px;height:16px;transform:translateX(-50%) rotate(45deg);background:rgba(4,10,22,0.88);border-right:1px solid rgba(100,200,255,0.2);border-bottom:1px solid rgba(100,200,255,0.2)}
 
 /* クリックFX */
 #click-fx{position:fixed;inset:0;z-index:15;pointer-events:none;overflow:hidden}
@@ -132,1013 +71,831 @@ html,body{width:100%;height:100%;overflow:hidden;
 @keyframes cfxA{0%{opacity:1;transform:translate(-50%,-50%) scale(0.25)}100%{opacity:0;transform:translate(-50%,-50%) scale(4.2)}}
 .cfx2{position:absolute;width:7px;height:7px;border-radius:50%;transform:translate(-50%,-50%);background:rgba(130,210,255,0.95);box-shadow:0 0 10px rgba(80,180,255,0.8);animation:cfxB 380ms ease-out forwards}
 @keyframes cfxB{0%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(0.1) translateY(-18px)}}
-
-/* 水滴 */
-.drop{position:fixed;pointer-events:none;border-radius:50% 50% 60% 40% / 50% 50% 70% 50%;background:rgba(80,160,255,0.15);border:1px solid rgba(100,190,255,0.2);animation:dropA linear forwards}
+.drop{position:fixed;pointer-events:none;border-radius:50% 50% 60% 40%/50% 50% 70% 50%;background:rgba(80,160,255,0.15);border:1px solid rgba(100,190,255,0.2);animation:dropA linear forwards}
 @keyframes dropA{0%{opacity:0.8;transform:scaleY(1)}100%{opacity:0;transform:scaleY(0.6) translateY(70px)}}
 
-/* ステータス */
 #status-line{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:20;font-size:11px;color:rgba(100,160,255,0.42);letter-spacing:0.08em;pointer-events:none;text-align:center;white-space:nowrap}
 
-/* 入力エリア */
+/* 入力 */
 #composer{position:fixed;bottom:0;left:0;right:0;z-index:30;padding:12px 16px 16px}
-#composer-inner{
-  max-width:700px;margin:0 auto;display:grid;grid-template-columns:1fr auto;gap:10px;
-  padding:10px;border-radius:22px;border:1px solid rgba(60,120,255,0.18);
-  background:rgba(3,7,18,0.82);backdrop-filter:blur(22px);
-  box-shadow:0 -4px 40px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.04)
-}
+#composer-inner{max-width:700px;margin:0 auto;display:grid;grid-template-columns:1fr auto;gap:10px;padding:10px;border-radius:22px;border:1px solid rgba(60,120,255,0.18);background:rgba(3,7,18,0.82);backdrop-filter:blur(22px);box-shadow:0 -4px 40px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.04)}
 #prompt-input{border:none;background:rgba(255,255,255,0.05);color:#c8e8ff;border-radius:14px;padding:12px 16px;font-size:14px;line-height:1.5;resize:none;min-height:48px;max-height:120px;outline:none;font-family:inherit}
 #prompt-input::placeholder{color:rgba(100,160,255,0.32)}
-#send-btn{align-self:stretch;min-width:86px;padding:0 16px;border:none;border-radius:14px;color:#02060e;font-weight:700;font-size:14px;cursor:pointer;background:linear-gradient(135deg,#5ab0ff,#7eeab0);box-shadow:0 0 20px rgba(80,180,255,0.22);transition:opacity .15s,transform .1s}
+#send-btn{align-self:stretch;min-width:86px;padding:0 16px;border:none;border-radius:14px;color:#02060e;font-weight:700;font-size:14px;cursor:pointer;background:linear-gradient(135deg,#5ab0ff,#7eeab0);transition:opacity .15s,transform .1s}
 #send-btn:hover{opacity:0.87}#send-btn:active{transform:scale(0.97)}#send-btn:disabled{opacity:0.38;cursor:wait}
 
+/* ════ 共通オーバーレイ ════ */
+.game-overlay{position:fixed;inset:0;z-index:50;background:rgba(1,4,12,0.92);backdrop-filter:blur(20px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.game-overlay.active{display:flex}
+.g-header{display:flex;align-items:center;gap:10px;width:100%;max-width:560px;padding:0 4px}
+.g-title{font-size:16px;font-weight:700;letter-spacing:0.1em;color:#7dc8ff}
+.g-info{font-size:12px;color:rgba(140,190,255,0.6);flex:1}
+.g-close{padding:6px 14px;border-radius:10px;border:1px solid rgba(100,200,255,0.2);background:rgba(10,20,40,0.7);color:#9dd8ff;font-size:12px;cursor:pointer}
+.g-close:hover{background:rgba(20,50,100,0.9)}
+.g-btn{padding:7px 18px;border-radius:12px;border:1px solid rgba(100,200,255,0.2);background:rgba(10,22,48,0.7);color:#9dd8ff;font-size:12px;cursor:pointer}
+.g-btn:hover{background:rgba(20,50,110,0.9)}
+.g-msg{font-size:13px;color:rgba(160,220,255,0.65);letter-spacing:0.06em;min-height:20px;text-align:center;max-width:520px}
+
 /* ════ 四川省 ════ */
-#game-overlay{
-  position:fixed;inset:0;z-index:50;
-  background:rgba(1,4,12,0.90);backdrop-filter:blur(18px);
-  display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px
-}
-#game-overlay.active{display:flex}
-#game-header{display:flex;align-items:center;gap:12px;width:100%;max-width:570px;padding:0 4px}
-#game-title{font-size:16px;font-weight:700;letter-spacing:0.1em;color:#7dc8ff}
-#game-info{font-size:12px;color:rgba(140,190,255,0.6);white-space:nowrap}
-#game-btns{display:flex;gap:8px;flex-shrink:0}
-#game-close{flex-shrink:0;padding:6px 14px;border-radius:10px;border:1px solid rgba(100,200,255,0.2);background:rgba(10,20,40,0.7);color:#9dd8ff;font-size:12px;cursor:pointer}
-#game-close:hover{background:rgba(20,50,100,0.9)}
-#game-board-wrap{position:relative}
-#game-board{display:grid;gap:5px;padding:14px;border-radius:18px;border:1px solid rgba(60,120,255,0.2);background:rgba(3,8,20,0.82)}
-.tile{
-  width:54px;height:54px;border-radius:10px;
-  border:1px solid rgba(80,150,255,0.22);
-  background:rgba(10,22,48,0.75);
-  font-size:24px;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:transform 0.1s,background 0.1s,border-color 0.1s;
-  user-select:none
-}
+#mahjong-board-wrap{position:relative}
+#mahjong-board{display:grid;gap:5px;padding:14px;border-radius:18px;border:1px solid rgba(60,120,255,0.2);background:rgba(3,8,20,0.82)}
+.tile{width:54px;height:54px;border-radius:10px;border:1px solid rgba(80,150,255,0.22);background:rgba(10,22,48,0.75);font-size:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .1s,background .1s;user-select:none}
 .tile:hover:not(.empty){background:rgba(20,50,100,0.85);border-color:rgba(100,180,255,0.45);transform:scale(1.06)}
 .tile.selected{background:rgba(30,80,180,0.75);border-color:rgba(120,200,255,0.7);box-shadow:0 0 14px rgba(80,160,255,0.45);transform:scale(1.1)}
 .tile.empty{cursor:default;background:rgba(5,10,22,0.4);border-color:rgba(40,80,160,0.1);pointer-events:none}
-.tile.flash{animation:tileFlash 0.4s ease-out forwards}
+.tile.flash{animation:tileFlash .4s ease-out forwards}
 @keyframes tileFlash{0%{background:rgba(80,200,255,0.55);transform:scale(1.18)}100%{background:rgba(5,10,22,0.4);transform:scale(1)}}
-#line-canvas{position:absolute;top:14px;left:14px;pointer-events:none;border-radius:4px}
-#game-msg{font-size:13px;color:rgba(160,220,255,0.65);letter-spacing:0.06em;min-height:20px;text-align:center;max-width:560px}
-.game-btn{padding:8px 18px;border-radius:12px;border:1px solid rgba(100,200,255,0.2);background:rgba(10,22,48,0.7);color:#9dd8ff;font-size:12px;cursor:pointer}
-.game-btn:hover{background:rgba(20,50,110,0.9)}
+#mj-line-canvas{position:absolute;top:14px;left:14px;pointer-events:none}
+
+/* ════ 苔キャッチ ════ */
+#moss-canvas{border-radius:16px;border:1px solid rgba(60,120,255,0.2);background:rgba(3,8,20,0.92);display:block;cursor:none}
+#moss-info{display:flex;gap:20px;font-size:13px;color:rgba(160,220,255,0.7)}
+.moss-stat span{color:#7dc8ff;font-weight:700}
+
+/* ════ 脱出クライミング ════ */
+#climb-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:360px}
+#climb-shaft{width:120px;height:300px;border-radius:10px;border:1px solid rgba(60,120,255,0.2);background:rgba(3,8,20,0.92);position:relative;overflow:hidden}
+#climb-char{position:absolute;left:50%;transform:translateX(-50%);width:60px;height:60px;object-fit:contain;mix-blend-mode:multiply;transition:bottom .1s}
+#climb-progress{position:absolute;bottom:0;left:0;right:0;background:rgba(60,120,255,0.15);transition:height .15s}
+#climb-goal{position:absolute;top:4px;left:50%;transform:translateX(-50%);font-size:18px}
+#climb-btn{width:220px;padding:16px;border-radius:16px;border:none;font-size:18px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#5ab0ff,#7eeab0);color:#02060e;user-select:none;-webkit-user-select:none}
+#climb-btn:active{transform:scale(0.97)}
+#climb-stats{font-size:13px;color:rgba(160,220,255,0.7);text-align:center;line-height:1.8}
+
+/* ════ ガラクタ鑑定 ════ */
+#junk-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:380px}
+#junk-item-box{width:180px;height:180px;border-radius:20px;border:1px solid rgba(60,120,255,0.2);background:rgba(3,8,20,0.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:64px;position:relative}
+#junk-item-name{font-size:14px;color:rgba(160,220,255,0.8);text-align:center}
+#junk-item-desc{font-size:11px;color:rgba(100,160,255,0.55);text-align:center;padding:0 8px}
+#junk-choice{display:flex;gap:14px}
+.junk-btn{width:120px;padding:12px;border-radius:14px;border:1px solid rgba(100,200,255,0.2);background:rgba(10,22,48,0.7);color:#9dd8ff;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s}
+.junk-btn:hover{background:rgba(20,50,110,0.9)}
+#junk-result{font-size:24px;font-weight:700;min-height:36px;text-align:center}
+#junk-collection{display:flex;flex-wrap:wrap;gap:6px;max-width:380px;justify-content:center;max-height:80px;overflow-y:auto}
+.junk-badge{font-size:20px;padding:4px;border-radius:8px;background:rgba(10,22,48,0.7);border:1px solid rgba(60,120,255,0.2)}
+
+/* ════ リズムゲーム ════ */
+#rhythm-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:400px}
+#rhythm-shaft{width:280px;height:320px;border-radius:16px;border:1px solid rgba(60,120,255,0.2);background:rgba(3,8,20,0.92);position:relative;overflow:hidden}
+.r-drop{position:absolute;border-radius:50%;pointer-events:none}
+#rhythm-hit-zone{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);width:200px;height:22px;border-radius:12px;border:2px solid rgba(100,200,255,0.4);background:rgba(60,120,255,0.1);display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(100,160,255,0.4);letter-spacing:.1em}
+#rhythm-btn{width:220px;padding:14px;border-radius:16px;border:none;font-size:16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#5ab0ff,#7eeab0);color:#02060e}
+#rhythm-btn:active{transform:scale(0.97)}
+#rhythm-stats{font-size:13px;color:rgba(160,220,255,0.7);text-align:center;line-height:1.9}
+#rhythm-echo{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);font-size:28px;pointer-events:none;opacity:0;z-index:60;text-shadow:0 0 20px rgba(120,200,255,0.9)}
 
 /* ゲーム中ぼやき */
-#taro-game-comment{
-  position:fixed;bottom:80px;left:16px;z-index:55;
-  max-width:190px;padding:9px 12px;border-radius:14px;
-  border:1px solid rgba(80,160,255,0.18);
-  background:rgba(4,10,22,0.84);color:rgba(160,210,255,0.75);
-  font-size:11px;line-height:1.6;pointer-events:none;
-  opacity:0;transition:opacity 300ms
-}
-#taro-game-comment.show{opacity:1}
-#taro-mini-img{position:fixed;bottom:114px;left:16px;z-index:54;width:50px;height:50px;object-fit:contain;mix-blend-mode:multiply;pointer-events:none;opacity:0;transition:opacity 300ms}
-#taro-mini-img.show{opacity:1}
+#taro-gc{position:fixed;bottom:80px;left:16px;z-index:55;max-width:190px;padding:9px 12px;border-radius:14px;border:1px solid rgba(80,160,255,0.18);background:rgba(4,10,22,0.84);color:rgba(160,210,255,0.75);font-size:11px;line-height:1.6;pointer-events:none;opacity:0;transition:opacity 300ms}
+#taro-gc.show{opacity:1}
+#taro-mini{position:fixed;bottom:114px;left:16px;z-index:54;width:50px;height:50px;object-fit:contain;mix-blend-mode:multiply;pointer-events:none;opacity:0;transition:opacity 300ms}
+#taro-mini.show{opacity:1}
 
 @media(max-width:600px){
   #side-l,#side-txt{display:none}
   #composer-inner{grid-template-columns:1fr}
   #send-btn{min-height:46px}
   .tile{width:44px;height:44px;font-size:20px}
+  #moss-canvas{width:320px!important;height:280px!important}
 }
 </style>
 </head>
 <body>
-<div id="bg"></div>
-<div id="bg-overlay"></div>
+<div id="bg"></div><div id="bg-overlay"></div>
 <canvas id="fx-canvas"></canvas>
-
-<div class="corner tl"></div><div class="corner tr"></div>
-<div class="corner bl"></div><div class="corner br"></div>
+<div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
 
 <div id="top-bar">
-  <div class="orn"></div>
-  <div id="top-title">どん底 井戸太郎</div>
-  <div class="orn r"></div>
+  <div class="orn"></div><div id="top-title">どん底 井戸太郎</div><div class="orn r"></div>
   <div id="top-sub">WELL BOTTOM SPIRIT</div>
   <div id="mood-wrap"><div class="mdot"></div><div id="mood-txt">ネガティブ中</div></div>
 </div>
-<button id="cleanup-btn">🧹 掃除（四川省）</button>
+
+<div id="game-menu">
+  <button class="gmenu-btn" id="btn-mahjong">🧹 四川省</button>
+  <button class="gmenu-btn" id="btn-moss">🌿 苔キャッチ</button>
+  <button class="gmenu-btn" id="btn-climb">🪜 脱出</button>
+  <button class="gmenu-btn" id="btn-junk">🔩 鑑定</button>
+  <button class="gmenu-btn" id="btn-rhythm">💧 リズム</button>
+</div>
 
 <div id="side-l"><div class="sbar"></div><div class="sbar"></div><div class="sbar"></div></div>
 <div id="side-txt">DEPTH : ∞</div>
 
 <div id="action-badge">[ 通常観測中 ]</div>
 
-<!-- キャラクター（クロスフェード用2枚構成） -->
 <div id="char-wrap">
   <div id="bubble"></div>
   <div id="char-shadow-el"></div>
   <img id="char-img-a" src="syomen.png" alt="井戸太郎"/>
   <img id="char-img-b" src="syomen.png" alt=""/>
+  <div id="char-click-zone"></div>
   <div id="zzz-fx">💤</div>
 </div>
 
 <div id="click-fx"></div>
 <div id="status-line">クリックすると反応するんだな</div>
 
-<div id="composer">
-  <div id="composer-inner">
-    <textarea id="prompt-input" rows="1" placeholder="井戸太郎に話しかける…"></textarea>
-    <button id="send-btn" type="button">送信</button>
+<div id="composer"><div id="composer-inner">
+  <textarea id="prompt-input" rows="1" placeholder="井戸太郎に話しかける…"></textarea>
+  <button id="send-btn" type="button">送信</button>
+</div></div>
+
+<!-- ════ 四川省 ════ -->
+<div id="mahjong-overlay" class="game-overlay">
+  <div class="g-header">
+    <div class="g-title">🪣 どん底四川省</div>
+    <div class="g-info">手数:<span id="mj-moves">40</span> ペア残:<span id="mj-pairs">12</span></div>
+    <button class="g-btn" id="mj-hint">ヒント</button>
+    <button class="g-btn" id="mj-reset">リセット</button>
+    <button class="g-close" id="mj-close">✕</button>
+  </div>
+  <div id="mahjong-board-wrap"><canvas id="mj-line-canvas"></canvas><div id="mahjong-board"></div></div>
+  <div class="g-msg" id="mj-msg">同じガラクタを2曲がり以内で結んで消すんだな。</div>
+</div>
+
+<!-- ════ 苔キャッチ ════ -->
+<div id="moss-overlay" class="game-overlay">
+  <div class="g-header">
+    <div class="g-title">🌿 どん底！苔キャッチ</div>
+    <div class="g-info" id="moss-info-txt"></div>
+    <button class="g-btn" id="moss-start">スタート</button>
+    <button class="g-close" id="moss-close">✕</button>
+  </div>
+  <canvas id="moss-canvas" width="400" height="360"></canvas>
+  <div class="g-msg" id="moss-msg">左右キー or タップで移動。苔をキャッチ！石は避けるんだな。</div>
+</div>
+
+<!-- ════ 脱出クライミング ════ -->
+<div id="climb-overlay" class="game-overlay">
+  <div class="g-header">
+    <div class="g-title">🪜 脱出！連打クライミング</div>
+    <div class="g-info" id="climb-info"></div>
+    <button class="g-close" id="climb-close">✕</button>
+  </div>
+  <div id="climb-wrap">
+    <div id="climb-shaft">
+      <div id="climb-progress"></div>
+      <div id="climb-goal">🌟</div>
+      <img id="climb-char" src="escape.png" alt="" style="bottom:10px"/>
+    </div>
+    <div id="climb-stats">最高到達: <b id="climb-best">0</b>m ／ 今回: <b id="climb-cur">0</b>m<br><span id="climb-status">ボタンを連打して登るんだな</span></div>
+    <button id="climb-btn">👆 登る！</button>
   </div>
 </div>
 
-<!-- 四川省 -->
-<div id="game-overlay">
-  <div id="game-header">
-    <div id="game-title">🪣 どん底四川省</div>
-    <div id="game-info">手数: <span id="moves-left">40</span> | ペア残: <span id="pairs-left">12</span></div>
-    <div id="game-btns">
-      <button class="game-btn" id="game-hint">ヒント</button>
-      <button class="game-btn" id="game-reset">リセット</button>
+<!-- ════ ガラクタ鑑定 ════ -->
+<div id="junk-overlay" class="game-overlay">
+  <div class="g-header">
+    <div class="g-title">🔩 ガラクタ鑑定</div>
+    <div class="g-info">正解:<span id="junk-correct">0</span> 連続:<span id="junk-streak">0</span></div>
+    <button class="g-close" id="junk-close">✕</button>
+  </div>
+  <div id="junk-wrap">
+    <div id="junk-item-box">
+      <div id="junk-emoji" style="font-size:64px"></div>
+      <div id="junk-item-name"></div>
+      <div id="junk-item-desc"></div>
     </div>
-    <button id="game-close">✕</button>
+    <div id="junk-choice">
+      <button class="junk-btn" id="junk-zero">0円なんだな</button>
+      <button class="junk-btn" id="junk-one">1円かもね</button>
+    </div>
+    <div id="junk-result"></div>
+    <div style="font-size:11px;color:rgba(100,160,255,0.5)">発見コレクション</div>
+    <div id="junk-collection"></div>
   </div>
-  <div id="game-board-wrap">
-    <canvas id="line-canvas"></canvas>
-    <div id="game-board"></div>
-  </div>
-  <div id="game-msg">同じガラクタを2曲がり以内で結んで消すんだな。</div>
 </div>
-<img id="taro-mini-img" src="syomen.png" alt=""/>
-<div id="taro-game-comment"></div>
+
+<!-- ════ リズムゲーム ════ -->
+<div id="rhythm-overlay" class="game-overlay">
+  <div class="g-header">
+    <div class="g-title">💧 どん底リズム：滴のしらべ</div>
+    <div class="g-info">コンボ:<span id="r-combo">0</span> スコア:<span id="r-score">0</span></div>
+    <button class="g-btn" id="r-start">スタート</button>
+    <button class="g-close" id="rhythm-close">✕</button>
+  </div>
+  <div id="rhythm-wrap">
+    <div id="rhythm-shaft">
+      <div id="rhythm-hit-zone">▼ ここでタップ ▼</div>
+    </div>
+    <div id="rhythm-stats">最高コンボ:<b id="r-best">0</b> ／ ハイスコア:<b id="r-hi">0</b></div>
+    <button id="rhythm-btn">💧 タップ！</button>
+  </div>
+</div>
+<div id="rhythm-echo">✨</div>
+<img id="taro-mini" src="syomen.png" alt=""/><div id="taro-gc"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script>
 (()=>{
-/* ════════════════════════════════
-   スプライト定義（全画像）
-════════════════════════════════ */
-const SPRITES={
-  front:'syomen.png', right:'migi.png', left:'hidari.png',
-  up:'ue.png',        down:'sita.png',
-  zzz:'zzz.png',      cook:'cook.png',
-  clean:'clean.jpg',  escape:'escape.png'
-};
-
-/* ════════════════════════════════
-   行動モード定義
-════════════════════════════════ */
-const MODES={
-  normal:{
-    sprite:null, // 動的に front/left/right/up/down を使う
-    badge:'[ 通常観測中 ]',
-    status:'✅ クリックすると反応するんだな。',
-    mood:'ネガティブ中',
-    monologue:['…静かなんだな。','水の音がするんだな。','暗くて気持ちいいんだな。',
-      '誰も来ないかもね。','底は深いんだな。','ぐしょぐしょしてるんだな。','光が見えないんだな。']
-  },
-  cook:{
-    sprite:'cook',
-    badge:'[ 苔の煮込み中 ]',
-    status:'🍄 苔の出汁がよく出てるんだな…',
-    mood:'料理中（たぶん）',
-    monologue:['苔の出汁がよく出てるんだな…','火加減がわからないんだな。','水が多すぎたかもね。',
-      'レシピなんてないんだな。','美味しくなくても、食べるんだな。']
-  },
-  clean:{
-    sprite:'clean',
-    badge:'[ 掃除中（やる気なし）]',
-    status:'🕸️ 蜘蛛の巣は、僕の唯一のインテリアなんだな…',
-    mood:'掃除中（なんとなく）',
-    monologue:['蜘蛛の巣は、僕の唯一のインテリアなんだな…','片付けても、また汚れるんだな。',
-      'ゴミと宝の区別がないんだな。','清潔さとは何なんだな。','疲れたんだな。もうやめたいんだな。']
-  },
-  escape:{
-    sprite:'escape',
-    badge:'[ 脱出シミュレーション中 ]',
-    status:'🪜 あと5万キロくらい登れば外に出られるかもね（嘘なんだな）',
-    mood:'脱出検討中',
-    monologue:['あと5万キロくらい登れば、外に出られるかもね（嘘なんだな）',
-      'やっぱり無理なんだな。','ここが一番安全なんだな。','外は怖いんだな。',
-      '脱出の練習だけしてるんだな。実行はしないんだな。']
-  },
-  zzz:{
-    sprite:'zzz',
-    badge:'[ 熟睡中（たぶん）。]',
-    status:'💤 熟睡中（たぶん）。',
-    mood:'夢の中（たぶん）',
-    monologue:['……むにゃ……','zzz…','……なんだな……（寝言）','……もう少しだけ……','……静かなんだな…zzz']
-  }
-};
-
-/* ランダム抽選テーブル */
-const MODE_TABLE=[
-  ...Array(40).fill('normal'),
-  ...Array(15).fill('cook'),
-  ...Array(15).fill('clean'),
-  ...Array(10).fill('escape'),
-  ...Array(20).fill('zzz')
+/* ══════════════════════════════════════
+   定数・データ
+══════════════════════════════════════ */
+const SP={front:'syomen.png',right:'migi.png',left:'hidari.png',up:'ue.png',down:'sita.png',
+          zzz:'zzz.png',cook:'cook.png',clean:'clean.jpg',escape:'escape.png'};
+const NORMAL_SP=[SP.front,SP.right,SP.left,SP.up,SP.down];
+const LIFE_MODES=[
+  {key:'cook', sprite:SP.cook, badge:'[ 苔の煮込み中 ]', status:'🍄 苔の出汁がよく出てるんだな…',
+   lines:['苔の煮込みは火加減が大事なんだな…','出汁が出てきたかもね。','水が多すぎたんだな。','美味しくなくても食べるんだな。']},
+  {key:'clean',sprite:SP.clean,badge:'[ 掃除中（やる気なし）]',status:'🕸️ 蜘蛛の巣は唯一のインテリアなんだな…',
+   lines:['蜘蛛の巣は、僕の唯一のインテリアなんだな…','片付けても意味ないんだな。','ゴミと宝の区別がないんだな。']},
+  {key:'escape',sprite:SP.escape,badge:'[ 脱出シミュレーション中 ]',status:'🪜 あと5万キロ登れば外に出られるかもね（嘘）',
+   lines:['あと5万キロ登れば出られるかもね（嘘なんだな）','やっぱり無理なんだな。','外は怖いんだな。']},
+  {key:'zzz',  sprite:SP.zzz,  badge:'[ 熟睡中（たぶん）。]',status:'💤 熟睡中（たぶん）。',
+   lines:['……むにゃ……','zzz…','……なんだな……（寝言）']}
 ];
-
-/* ════════════════════════════════
-   セリフ 100個
-════════════════════════════════ */
-const taroQuotes=[
-"お腹空いたけど、ここは苔しかないんだな。","上からゴミが落ちてきた……僕へのプレゼントかもね。",
-"明るいところは眩しすぎて、目が溶けちゃうんだな。","足元がじめじめしてて、落ち着くんだな。",
-"誰も来ないのが一番いいんだな。","たまにカエルの鳴き声が聞こえる……羨ましいかもね。",
-"僕の体、実は泥でできてるのかもしれないんだな。","太陽なんて、都市伝説だと思ってるんだな。",
-"ここで一生を終えるのも、悪くないかもね。","さっきから見てるけど、暇なんだな。",
-"期待されるのが一番苦手なんだな。","井戸の壁、1万枚目の石を見つけたんだな。",
-"もちもちしてるのは、防御反応かもね。","声をかけられても、何も出ないんだな。",
-"夢も希望も、井戸の隙間に挟まってるんだな。","湿度が100%超えてる気がするんだな。",
-"何かいいこと、あるわけないんだな。","今日も一歩も動いてない……最高かもね。",
-"影と喋るのが一番疲れいないんだな。","僕を外に出そうなんて、思わないでほしいんだな。",
-"肺が苔になりそうなんだな。","頑張るって、どういう意味だったっけ……。",
-"誰かが石を投げた……頭に当たればよかったかもね。","暗闇は友達だけど、たまに無視されるんだな。",
-"井戸の底が、僕の全宇宙なんだな。","思考が停止してる時が、一番幸せかもね。",
-"呼吸するのも面倒になってきたんだな。","昨日の自分と、今日の自分、どっちも消えたいんだな。",
-"バケツが降りてきても、乗らないんだな。","空が丸いって、誰が決めたんだな。",
-"幸せな人の声が、遠くで響いてて不快なんだな。","僕はただの餅の塊なんだな。",
-"掃除はしない。汚れてる方が落ち着くんだな。","根っこが伸びてきた。絡まって動けなくなればいいかもね。",
-"逃げ場所がここしかないんだな。","笑顔の練習、10年前にやめたんだな。",
-"重力がここでは3倍くらいある気がするんだな。","蚊に刺されても、痒がる元気がないんだな。",
-"世界が滅びても、ここは静かだろうな。","足が短いから、逃げ足も遅いんだな。",
-"「大丈夫」って言葉、呪いみたいなんだな。","カビが生えてきた。おしゃれかもね。",
-"誰かに似てる？それは心外なんだな。","下には下がいるっていうけど、僕が最下層なんだな。",
-"井戸水が冷たくて、心が凍りそうなんだな。","喋りすぎた……1年分くらい、エネルギー使ったんだな。",
-"明日が来るのが、一番の恐怖かもね。","どん底って、意外と安定感があるんだな。",
-"僕は役立たずのプロなんだな。","励ましなんて、井戸の底には届かないんだな。",
-"誰かの落としたコインが沈んでる……重そうなんだな。","自分の影が一番の話し相手かもね。",
-"努力は裏切るけど、絶望は裏切らないんだな。","筋肉なんて、もちもちの邪魔なだけなんだな。",
-"立ち上がる理由が見つからないんだな。","井戸の壁に名前を彫ろうとしたけど、すぐ飽きたんだな。",
-"虫が這ってる……くすぐったいけど、そのままにするんだな。","雨が降ると、少しだけ水位が上がる……溺れたらその時かもね。",
-"考えるのをやめると、体が軽くなる気がするんだな。","僕のこと、忘れてくれていいんだな。",
-"100点満点で、マイナス500点くらいで生きてるんだな。","向上心？そんなの、地上に置いてきたんだな。",
-"自分の声が響くのが、たまに怖いんだな。","湿った土の匂い……これが僕の香水なんだな。",
-"変化はいらない。ずっとこのままでいいんだな。","心なんて、最初から持ってないかもね。",
-"「生きてるだけで偉い」とか、聞き飽きたんだな。","僕が消えても、井戸は井戸のままなんだな。",
-"何もしないのが、僕にできる唯一の貢献なんだな。","背中が丸いのは、絶望を背負ってるから……嘘なんだな、元々なんだな。",
-"幸せの基準を、地面より下に設定してるんだな。","孤独は寂しいけど、誰かといるのは苦しいんだな。",
-"僕を拾っても、何もいいことないんだな。","水たまりに映る顔が、ひどくブサイクなんだな。",
-"誰かに褒められたら、逆に不安になるんだな。","明るいニュースなんて、井戸を通り過ぎていくだけなんだな。",
-"感情が、泥みたいにドロドロしてるんだな。","眠るのが、一番の娯楽かもね。",
-"起きた瞬間から、寝る時のこと考えてるんだな。","井戸の底に、もう一人僕がいればいいのに……やっぱり嫌なんだな。",
-"僕の人生、ずっとお通夜みたいなもんなんだな。","誰かが歌ってる……音痴で安心したんだな。",
-"骨が落ちてる。僕の先祖かもね。","鏡を見るのが、世界で一番嫌な仕事なんだな。",
-"進歩がないのが、僕の取り柄なんだな。","夢の中でだけ、空を飛べるんだな。",
-"現実は、いつも湿ってて冷たいんだな。","井戸の外には、もっと怖い怪物がいるはずなんだな。",
-"僕のことは、ただの障害物だと思っていいんだな。","言葉にするのも、疲れるんだな。",
-"期待されるくらいなら、嫌われた方がマシなんだな。","根っこが僕の足を掴んでる。離さないでほしいんだな。",
-"井戸の底には、終わりしかないんだな。","誰かのため、なんて一秒も思えないんだな。",
-"僕はただの、息をしてるだけのゴミかもね。","幸せになりたいなんて、贅沢なんだな。",
-"静寂だけが、僕を裏切らないんだな。","もう、放っておいてほしいんだな。",
-"ああ、また一言喋っちゃった。無駄遣いなんだな。","これで終わり……やっと黙れるんだな。"
-];
-
-const GAME_COMMENTS=["片付けても無駄なんだな…","どうせまた散らかるんだな…","掃除って、誰得なんだな。",
-  "疲れた…もうやめたいんだな。","きれいにしても、僕の心は汚れてるんだな。","ガラクタは友達だったんだな。"];
+const taroQ=["お腹空いたけど、ここは苔しかないんだな。","上からゴミが落ちてきた……僕へのプレゼントかもね。","明るいところは眩しすぎて、目が溶けちゃうんだな。","足元がじめじめしてて、落ち着くんだな。","誰も来ないのが一番いいんだな。","たまにカエルの鳴き声が聞こえる……羨ましいかもね。","僕の体、実は泥でできてるのかもしれないんだな。","太陽なんて、都市伝説だと思ってるんだな。","ここで一生を終えるのも、悪くないかもね。","さっきから見てるけど、暇なんだな。","期待されるのが一番苦手なんだな。","井戸の壁、1万枚目の石を見つけたんだな。","もちもちしてるのは、防御反応かもね。","声をかけられても、何も出ないんだな。","夢も希望も、井戸の隙間に挟まってるんだな。","湿度が100%超えてる気がするんだな。","何かいいこと、あるわけないんだな。","今日も一歩も動いてない……最高かもね。","影と喋るのが一番疲れいないんだな。","僕を外に出そうなんて、思わないでほしいんだな。","肺が苔になりそうなんだな。","頑張るって、どういう意味だったっけ……。","誰かが石を投げた……頭に当たればよかったかもね。","暗闇は友達だけど、たまに無視されるんだな。","井戸の底が、僕の全宇宙なんだな。","思考が停止してる時が、一番幸せかもね。","呼吸するのも面倒になってきたんだな。","バケツが降りてきても、乗らないんだな。","空が丸いって、誰が決めたんだな。","幸せな人の声が、遠くで響いてて不快なんだな。","僕はただの餅の塊なんだな。","逃げ場所がここしかないんだな。","笑顔の練習、10年前にやめたんだな。","重力がここでは3倍くらいある気がするんだな。","世界が滅びても、ここは静かだろうな。","「大丈夫」って言葉、呪いみたいなんだな。","カビが生えてきた。おしゃれかもね。","下には下がいるっていうけど、僕が最下層なんだな。","どん底って、意外と安定感があるんだな。","僕は役立たずのプロなんだな。","努力は裏切るけど、絶望は裏切らないんだな。","立ち上がる理由が見つからないんだな。","考えるのをやめると、体が軽くなる気がするんだな。","僕のこと、忘れてくれていいんだな。","向上心？そんなの、地上に置いてきたんだな。","変化はいらない。ずっとこのままでいいんだな。","「生きてるだけで偉い」とか、聞き飽きたんだな。","何もしないのが、僕にできる唯一の貢献なんだな。","孤独は寂しいけど、誰かといるのは苦しいんだな。","眠るのが、一番の娯楽かもね。","起きた瞬間から、寝る時のこと考えてるんだな。","進歩がないのが、僕の取り柄なんだな。","現実は、いつも湿ってて冷たいんだな。","言葉にするのも、疲れるんだな。","静寂だけが、僕を裏切らないんだな。","もう、放っておいてほしいんだな。","ああ、また一言喋っちゃった。無駄遣いなんだな。","これで終わり……やっと黙れるんだな。","幸せになりたいなんて、贅沢なんだな。","僕はただの、息をしてるだけのゴミかもね。"];
+const GCMT=["片付けても無駄なんだな…","どうせまた散らかるんだな…","掃除って、誰得なんだな。","疲れた…もうやめたいんだな。","ガラクタは友達だったんだな。"];
 const MOODS=['ネガティブ中','暗澹とした','どん底気分','ふさいでいる','やる気皆無'];
+const MNLG=['…静かなんだな。','水の音がするんだな。','暗くて気持ちいいんだな。','誰も来ないかもね。','底は深いんだな。','ぐしょぐしょしてるんだな。'];
+function rnd(a){return a[Math.floor(Math.random()*a.length)];}
 
-/* ════ DOM ════ */
-const charWrap   =document.getElementById('char-wrap');
-const imgA       =document.getElementById('char-img-a');
-const imgB       =document.getElementById('char-img-b');
-const zzzFx      =document.getElementById('zzz-fx');
-const charShadow =document.getElementById('char-shadow-el');
-const bubble     =document.getElementById('bubble');
+/* DOM */
+const charWrap=document.getElementById('char-wrap');
+const imgA=document.getElementById('char-img-a'), imgB=document.getElementById('char-img-b');
+const zzzFx=document.getElementById('zzz-fx');
+const charShadow=document.getElementById('char-shadow-el');
+const charClickZone=document.getElementById('char-click-zone');
+const bubble=document.getElementById('bubble');
 const clickFxWrap=document.getElementById('click-fx');
-const fxCanvas   =document.getElementById('fx-canvas');
-const statusLine =document.getElementById('status-line');
+const fxCanvas=document.getElementById('fx-canvas');
+const statusLine=document.getElementById('status-line');
 const promptInput=document.getElementById('prompt-input');
-const sendBtn    =document.getElementById('send-btn');
-const moodTxt    =document.getElementById('mood-txt');
-const cleanupBtn =document.getElementById('cleanup-btn');
+const sendBtn=document.getElementById('send-btn');
+const moodTxt=document.getElementById('mood-txt');
 const actionBadge=document.getElementById('action-badge');
+const taroMini=document.getElementById('taro-mini');
+const taroGC=document.getElementById('taro-gc');
 
-let bubbleTimer=null, isThinking=false;
+let bubbleTimer=null, isThinking=false, isDragging=false, lastPD=0;
 const chatHistory=[];
-let isDragging=false, lastPointerDown=0;
-
-/* ════════════════════════════════
-   気まぐれ生活観測システム
-════════════════════════════════ */
+let frontImg=imgA, backImg=imgB;
+let activeSprite=SP.front;
 let currentMode='normal';
-let activeSprite=SPRITES.front; // 現在表示中のsrc
-let frontImg=imgA, backImg=imgB; // クロスフェード用前後
-let idleTimer=null;
-let lastInteractTime=Date.now();
+let lifeReturnTimer=null;
+let gcTimer=null, gcIdx=0;
+let moveTarget=null, manualBoost=0;
 
-function rand(arr){return arr[Math.floor(Math.random()*arr.length)];}
-
-/* スプライトをクロスフェードで切り替え */
-function crossFadeSprite(newSrc, onDone){
-  if(backImg.getAttribute('src')===newSrc && activeSprite===newSrc){
-    if(onDone)onDone(); return;
-  }
-  backImg.src=newSrc;
+/* ════ クロスフェード ════ */
+function crossFade(src, cb){
+  if(activeSprite===src){if(cb)cb();return;}
+  backImg.src=src;
   gsap.set(backImg,{opacity:0,zIndex:12});
   gsap.set(frontImg,{zIndex:11});
   gsap.to(backImg,{opacity:1,duration:0.5,ease:'power1.inOut',onComplete:()=>{
     gsap.set(frontImg,{opacity:0});
-    // swap
-    const tmp=frontImg; frontImg=backImg; backImg=tmp;
-    activeSprite=newSrc;
-    if(onDone)onDone();
+    [frontImg,backImg]=[backImg,frontImg];
+    activeSprite=src; if(cb)cb();
   }});
 }
 
-/* モード切替 */
-function applyMode(modeName, silent=false){
-  currentMode=modeName;
-  const m=MODES[modeName];
+/* ════ 生活モード管理 ════ */
+let idleSpTimer=null;
+function startIdleSpriteCycle(){
+  stopIdleSpriteCycle();
+  // 通常時：3〜7秒おきにランダムスプライト
+  function cycle(){
+    if(currentMode!=='normal')return;
+    const s=rnd(NORMAL_SP);
+    if(activeSprite!==s) crossFade(s);
+    idleSpTimer=setTimeout(cycle,3000+Math.random()*4000);
+  }
+  idleSpTimer=setTimeout(cycle,4000);
+}
+function stopIdleSpriteCycle(){clearTimeout(idleSpTimer);idleSpTimer=null;}
 
-  // バッジ
-  actionBadge.textContent=m.badge;
-  actionBadge.classList.add('show');
-
-  // ステータス
+function applyLifeMode(m){
+  currentMode=m.key;
+  stopIdleSpriteCycle();
+  if(lifeReturnTimer)clearTimeout(lifeReturnTimer);
+  crossFade(m.sprite);
+  actionBadge.textContent=m.badge; actionBadge.classList.add('show');
   statusLine.textContent=m.status;
-  moodTxt.textContent=m.mood;
-
-  // スプライト
-  if(m.sprite){
-    crossFadeSprite(SPRITES[m.sprite]);
+  moodTxt.textContent=rnd(MOODS);
+  showBubble(rnd(m.lines),7000);
+  if(m.key==='zzz'){
+    gsap.to(zzzFx,{opacity:1,duration:.6});
+    gsap.to(zzzFx,{y:-28,duration:2.4,ease:'sine.inOut',yoyo:true,repeat:-1});
   }else{
-    crossFadeSprite(SPRITES.front);
+    gsap.killTweensOf(zzzFx);gsap.to(zzzFx,{opacity:0,y:0,duration:.4});
   }
-
-  // ZZZエフェクト
-  if(modeName==='zzz'){
-    gsap.to(zzzFx,{opacity:1,duration:0.6});
-    gsap.to(zzzFx,{y:-30,duration:2.5,ease:'sine.inOut',yoyo:true,repeat:-1});
-  }else{
-    gsap.killTweensOf(zzzFx);
-    gsap.to(zzzFx,{opacity:0,y:0,duration:0.4});
-  }
-
-  // 睡眠中は物理的にゆっくりに
-  if(modeName==='zzz'){
-    engine.gravity.y=0.06;
-  }else if(modeName==='escape'){
-    engine.gravity.y=0.08; // 軽め＝よく跳ねる
-  }else{
-    engine.gravity.y=0.18;
-  }
-
-  if(!silent) showBubble(rand(m.monologue),6000);
+  // 10〜20秒後に通常へ戻る
+  const delay=(10+Math.random()*10)*1000;
+  lifeReturnTimer=setTimeout(returnToNormal,delay);
 }
 
-/* ランダム抽選 */
-function rollMode(){
-  const picked=MODE_TABLE[Math.floor(Math.random()*MODE_TABLE.length)];
-  applyMode(picked);
+function returnToNormal(){
+  currentMode='normal';
+  if(lifeReturnTimer)clearTimeout(lifeReturnTimer);
+  gsap.killTweensOf(zzzFx);gsap.to(zzzFx,{opacity:0,y:0,duration:.3});
+  crossFade(SP.front,()=>startIdleSpriteCycle());
+  actionBadge.textContent='[ 通常観測中 ]';
+  statusLine.textContent='✅ クリックすると反応するんだな。';
+  moodTxt.textContent='ネガティブ中';
 }
 
-/* 放置10分→強制 zzz */
-function resetIdleTimer(){
-  lastInteractTime=Date.now();
-  if(idleTimer)clearTimeout(idleTimer);
-  idleTimer=setTimeout(()=>{
-    if(currentMode!=='zzz') applyMode('zzz');
-  }, 10*60*1000); // 10分
-}
+/* ════ パーティクル ════ */
+const pCtx=fxCanvas.getContext('2d'); let cW,cH;
+function resizeCv(){cW=fxCanvas.width=innerWidth;cH=fxCanvas.height=innerHeight;}resizeCv();
+class Ptcl{constructor(){this.r2(true)}r2(i=false){this.x=Math.random()*cW;this.y=i?Math.random()*cH:cH+12;this.vx=(Math.random()-.5)*.1;this.vy=-(0.12+Math.random()*.38);this.r=.7+Math.random()*2;this.a=.07+Math.random()*.22;this.l=0;this.m=200+Math.random()*320;this.g=Math.random()<.3;}
+tick(){this.x+=this.vx;this.y+=this.vy;this.l++;if(this.l>this.m||this.y<-12)this.r2();}
+draw(){const p=this.l/this.m,a=this.a*(p<.15?p/.15:p>.82?(1-p)/.18:1);if(this.g){const g=pCtx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r*5);g.addColorStop(0,`rgba(70,170,255,${a})`);g.addColorStop(1,'rgba(0,0,0,0)');pCtx.fillStyle=g;pCtx.beginPath();pCtx.arc(this.x,this.y,this.r*5,0,Math.PI*2);pCtx.fill();}else{pCtx.fillStyle=`rgba(130,195,255,${a*.65})`;pCtx.beginPath();pCtx.arc(this.x,this.y,this.r,0,Math.PI*2);pCtx.fill();}}}
+const ptcls=Array.from({length:80},()=>new Ptcl());
+function dFX(){pCtx.clearRect(0,0,cW,cH);ptcls.forEach(p=>{p.tick();p.draw();});requestAnimationFrame(dFX);}dFX();
+setInterval(()=>{const el=document.createElement('div');el.className='drop';const s=3+Math.random()*7,d=1+Math.random()*2.2;el.style.cssText=`left:${10+Math.random()*(innerWidth-20)}px;top:-10px;width:${s}px;height:${s*1.5}px;animation-duration:${d}s`;document.body.appendChild(el);setTimeout(()=>el.remove(),d*1000+300);},300);
 
-/* ページ読み込み時に1回抽選、以降3〜6分おきに再抽選 */
-function scheduleNextRoll(){
-  const delay=(3+Math.random()*3)*60*1000; // 3〜6分
-  setTimeout(()=>{
-    // 操作後1分以内なら normal に戻しやすく
-    const idle=(Date.now()-lastInteractTime)/1000;
-    if(idle>60) rollMode();
-    else applyMode('normal',true);
-    scheduleNextRoll();
-  },delay);
-}
-
-/* ユーザー操作でスリープ解除 */
-function onInteract(){
-  resetIdleTimer();
-  if(currentMode==='zzz'){
-    applyMode('normal');
-  }
-}
-
-/* ════════════════════════════════
-   パーティクル背景
-════════════════════════════════ */
-const pCtx=fxCanvas.getContext('2d');
-let cW,cH;
-function resizeCanvas(){cW=fxCanvas.width=innerWidth;cH=fxCanvas.height=innerHeight;}
-resizeCanvas();
-class Particle{
-  constructor(){this.reset(true)}
-  reset(init=false){
-    this.x=Math.random()*cW;this.y=init?Math.random()*cH:cH+12;
-    this.vx=(Math.random()-0.5)*0.1;this.vy=-(0.12+Math.random()*0.38);
-    this.r=0.7+Math.random()*2.0;this.alpha=0.07+Math.random()*0.22;
-    this.life=0;this.maxL=200+Math.random()*320;this.glow=Math.random()<0.3;
-  }
-  tick(){this.x+=this.vx;this.y+=this.vy;this.life++;if(this.life>this.maxL||this.y<-12)this.reset();}
-  draw(){
-    const p=this.life/this.maxL;
-    const a=this.alpha*(p<0.15?p/0.15:p>0.82?(1-p)/0.18:1);
-    if(this.glow){
-      const g=pCtx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r*5);
-      g.addColorStop(0,`rgba(70,170,255,${a})`);g.addColorStop(1,'rgba(0,0,0,0)');
-      pCtx.fillStyle=g;pCtx.beginPath();pCtx.arc(this.x,this.y,this.r*5,0,Math.PI*2);pCtx.fill();
-    }else{
-      pCtx.fillStyle=`rgba(130,195,255,${a*0.65})`;
-      pCtx.beginPath();pCtx.arc(this.x,this.y,this.r,0,Math.PI*2);pCtx.fill();
-    }
-  }
-}
-const particles=Array.from({length:85},()=>new Particle());
-function drawFX(){pCtx.clearRect(0,0,cW,cH);particles.forEach(p=>{p.tick();p.draw();});requestAnimationFrame(drawFX);}
-drawFX();
-
-function spawnDrop(){
-  const el=document.createElement('div');el.className='drop';
-  const size=3+Math.random()*7,dur=1.0+Math.random()*2.2;
-  el.style.cssText=`left:${10+Math.random()*(innerWidth-20)}px;top:-10px;width:${size}px;height:${size*1.5}px;animation-duration:${dur}s`;
-  document.body.appendChild(el);setTimeout(()=>el.remove(),dur*1000+300);
-}
-setInterval(spawnDrop,300);
-
-/* ════════════════════════════════
-   Matter.js 物理エンジン（強化版）
-════════════════════════════════ */
-const {Engine,Render,Runner,Bodies,Body,Composite,Mouse,MouseConstraint,Events,Vector}=Matter;
-const engine=Engine.create();
-engine.gravity.y=0.18;
-
-const physCanvas=document.createElement('canvas');
-physCanvas.style.cssText='position:fixed;inset:0;opacity:0;pointer-events:none;z-index:-1';
-document.body.appendChild(physCanvas);
-const mRender=Render.create({
-  element:document.body,canvas:physCanvas,engine,
-  options:{width:innerWidth,height:innerHeight,wireframes:false,background:'transparent',pixelRatio:1}
-});
-
+/* ════ Matter.js ════ */
+const{Engine,Render,Runner,Bodies,Body,Composite,Mouse,MouseConstraint,Events,Vector}=Matter;
+const engine=Engine.create();engine.gravity.y=0.18;
+const physCv=document.createElement('canvas');physCv.style.cssText='position:fixed;inset:0;opacity:0;pointer-events:none;z-index:-1';document.body.appendChild(physCv);
+const mRender=Render.create({element:document.body,canvas:physCv,engine,options:{width:innerWidth,height:innerHeight,wireframes:false,background:'transparent',pixelRatio:1}});
 let walls=[];
-function buildWalls(){
-  walls.forEach(w=>Composite.remove(engine.world,w));
-  const W=innerWidth,H=innerHeight;
-  walls=[
-    Bodies.rectangle(W/2,H+100,W*3,200,{isStatic:true}),
-    Bodies.rectangle(W/2,-100,W*3,200,{isStatic:true}),
-    Bodies.rectangle(-100,H/2,200,H*3,{isStatic:true}),
-    Bodies.rectangle(W+100,H/2,200,H*3,{isStatic:true})
-  ];
-  Composite.add(engine.world,walls);
-}
-buildWalls();
-
-const charBody=Bodies.circle(innerWidth/2,innerHeight*0.5,52,{
-  restitution:0.92,friction:0.015,frictionAir:0.025,density:0.0012,slop:0.04,
-  render:{visible:false}
-});
-Composite.add(engine.world,charBody);
-
-const mouse=Mouse.create(document.body);
-const mc=MouseConstraint.create(engine,{mouse,constraint:{stiffness:0.08,angularStiffness:0.1,render:{visible:false}}});
-Composite.add(engine.world,mc);
+function buildWalls(){walls.forEach(w=>Composite.remove(engine.world,w));const W=innerWidth,H=innerHeight;walls=[Bodies.rectangle(W/2,H+100,W*3,200,{isStatic:true}),Bodies.rectangle(W/2,-100,W*3,200,{isStatic:true}),Bodies.rectangle(-100,H/2,200,H*3,{isStatic:true}),Bodies.rectangle(W+100,H/2,200,H*3,{isStatic:true})];Composite.add(engine.world,walls);}buildWalls();
+const charBody=Bodies.circle(innerWidth/2,innerHeight*.5,52,{restitution:.92,friction:.015,frictionAir:.025,density:.0012,slop:.04,render:{visible:false}});Composite.add(engine.world,charBody);
+const mouse=Mouse.create(document.body);const mc=MouseConstraint.create(engine,{mouse,constraint:{stiffness:.08,angularStiffness:.1,render:{visible:false}}});Composite.add(engine.world,mc);
 Events.on(mc,'startdrag',e=>{if(e.body===charBody)isDragging=true;});
 Events.on(mc,'enddrag',()=>{isDragging=false;});
+Render.run(mRender);Runner.run(Runner.create(),engine);
 
-Render.run(mRender);
-const runner=Runner.create();
-Runner.run(runner,engine);
-
-let walkTick=0,jumpCooldown=0,manualBoost=0;
-let moveTarget=null;
-
+let walkTick=0,jumpCooldown=0;
 Events.on(engine,'beforeUpdate',()=>{
-  const W=innerWidth,H=innerHeight;
-  walkTick+=0.095;
-  jumpCooldown--;
-
-  // センターへの緩い引力
-  const toCenter=Vector.sub({x:W*0.5,y:H*0.52},charBody.position);
-  const fc=isDragging?0.000003:(currentMode==='zzz'?0.000006:0.000012);
-  Body.applyForce(charBody,charBody.position,{
-    x:toCenter.x*fc,
-    y:toCenter.y*fc-(currentMode==='zzz'?0.00055:0.00068)
-  });
-
+  const W=innerWidth,H=innerHeight;walkTick+=.095;jumpCooldown--;
+  const toC=Vector.sub({x:W*.5,y:H*.52},charBody.position);
+  Body.applyForce(charBody,charBody.position,{x:toC.x*.000011,y:toC.y*.000011-.00068});
   if(moveTarget){
-    const to=Vector.sub(moveTarget,charBody.position);
-    const dist=Math.hypot(to.x,to.y);
+    const to=Vector.sub(moveTarget,charBody.position),dist=Math.hypot(to.x,to.y);
     if(dist<16){moveTarget=null;manualBoost=0;}
-    else{
-      const nx=to.x/dist,ny=to.y/dist;
-      const sp=Math.min(dist/160,1.4);
-      manualBoost=Math.min(manualBoost+0.05,1);
-      const fmag=(currentMode==='escape'?0.0024:0.0018)*sp*(0.8+manualBoost*0.6);
-      Body.applyForce(charBody,charBody.position,{x:nx*fmag,y:ny*fmag*0.85});
-      if(jumpCooldown<=0&&dist>80&&Math.random()<0.045){
-        Body.applyForce(charBody,charBody.position,{x:nx*0.0012,y:-0.018-Math.random()*0.005});
-        jumpCooldown=25+Math.random()*12;
-      }
-    }
+    else{const nx=to.x/dist,ny=to.y/dist,sp=Math.min(dist/160,1.4);manualBoost=Math.min(manualBoost+.05,1);const fm=.0018*sp*(.8+manualBoost*.6);Body.applyForce(charBody,charBody.position,{x:nx*fm,y:ny*fm*.85});if(jumpCooldown<=0&&dist>80&&Math.random()<.045){Body.applyForce(charBody,charBody.position,{x:nx*.0012,y:-.018-Math.random()*.005});jumpCooldown=25+Math.random()*12;}}
   }else{
-    manualBoost=Math.max(manualBoost-0.03,0);
-    // 行動モードで自律移動の性格を変える
-    if(currentMode==='zzz'){
-      // zzz: ほぼ動かない、たまにぴくっとする
-      if(Math.random()<0.003){
-        Body.applyForce(charBody,charBody.position,{x:(Math.random()-0.5)*0.0008,y:-0.004});
-      }
-    }else if(currentMode==='escape'){
-      // escape: よく跳ねる、あちこち動く
-      const sway=Math.sin(walkTick)*0.0008+Math.sin(walkTick*0.55)*0.0004;
-      Body.applyForce(charBody,charBody.position,{x:sway,y:Math.sin(walkTick*0.6)*0.0001});
-      if(jumpCooldown<=0&&Math.random()<0.025){
-        const dir=(Math.random()-0.5)*2;
-        Body.applyForce(charBody,charBody.position,{x:dir*0.0022,y:-0.028-Math.random()*0.01});
-        jumpCooldown=35+Math.random()*25;
-      }
-    }else if(currentMode==='cook'||currentMode==='clean'){
-      // cook/clean: 小さくうろうろ
-      const sway=Math.sin(walkTick*1.4)*0.0004;
-      Body.applyForce(charBody,charBody.position,{x:sway,y:0});
-      if(jumpCooldown<=0&&Math.random()<0.006){
-        Body.applyForce(charBody,charBody.position,{x:(Math.random()-0.5)*0.0010,y:-0.012});
-        jumpCooldown=70+Math.random()*50;
-      }
-    }else{
-      // normal: 通常のよたよた
-      const sway=Math.sin(walkTick)*0.00058+Math.sin(walkTick*0.4)*0.00024;
-      Body.applyForce(charBody,charBody.position,{x:sway,y:Math.sin(walkTick*0.52)*0.00007});
-      if(jumpCooldown<=0&&Math.random()<0.014){
-        const dir=(Math.random()-0.5)*2;
-        Body.applyForce(charBody,charBody.position,{x:dir*0.0015,y:-0.022-Math.random()*0.007});
-        jumpCooldown=50+Math.random()*40;
-      }
-    }
+    manualBoost=Math.max(manualBoost-.03,0);
+    const sw=Math.sin(walkTick)*.00058+Math.sin(walkTick*.4)*.00024;
+    Body.applyForce(charBody,charBody.position,{x:sw,y:Math.sin(walkTick*.52)*.00007});
+    if(jumpCooldown<=0&&Math.random()<.014){Body.applyForce(charBody,charBody.position,{x:(Math.random()-.5)*2*.0015,y:-.022-Math.random()*.007});jumpCooldown=50+Math.random()*40;}
   }
-
-  // 壁押し返し
-  const {x,y}=charBody.position;
-  const pad=72;
-  if(x<pad)Body.setVelocity(charBody,{x:Math.abs(charBody.velocity.x)*0.9+1.1,y:charBody.velocity.y});
-  if(x>innerWidth-pad)Body.setVelocity(charBody,{x:-Math.abs(charBody.velocity.x)*0.9-1.1,y:charBody.velocity.y});
-  if(y<pad)Body.setVelocity(charBody,{x:charBody.velocity.x,y:Math.abs(charBody.velocity.y)*0.9+0.9});
-  if(y>innerHeight-pad)Body.setVelocity(charBody,{x:charBody.velocity.x,y:-Math.abs(charBody.velocity.y)*0.9-1.2});
+  const{x,y}=charBody.position,pad=72;
+  if(x<pad)Body.setVelocity(charBody,{x:Math.abs(charBody.velocity.x)*.9+1.1,y:charBody.velocity.y});
+  if(x>W-pad)Body.setVelocity(charBody,{x:-Math.abs(charBody.velocity.x)*.9-1.1,y:charBody.velocity.y});
+  if(y<pad)Body.setVelocity(charBody,{x:charBody.velocity.x,y:Math.abs(charBody.velocity.y)*.9+.9});
+  if(y>H-pad)Body.setVelocity(charBody,{x:charBody.velocity.x,y:-Math.abs(charBody.velocity.y)*.9-1.2});
 });
 
-/* ── ビジュアル同期 ── */
-let pendingSprite=SPRITES.front,spriteHold=0;
-const SPRITE_HOLD=4;
-
+let pSpr=SP.front,sHold=0; const SHOLD=4;
 Events.on(engine,'afterUpdate',()=>{
-  const {x,y}=charBody.position;
-  const vx=charBody.velocity.x,vy=charBody.velocity.y;
-  const t=performance.now()*0.001;
-  const idle=Math.abs(vx)<0.4&&Math.abs(vy)<0.4;
-
-  charWrap.style.left=x+'px';
-  charWrap.style.top=y+'px';
-
-  // 睡眠中は揺れ少なく
-  const tScale=currentMode==='zzz'?0.3:1.0;
-  const tiltY=Math.max(-14,Math.min(14,vx*2.2))*tScale;
-  const tiltX=Math.max(-12,Math.min(12,-vy*1.8))*tScale;
-  const swing=idle?Math.sin(t*2.1)*2.2*tScale:Math.sin(t*8.0)*Math.min(Math.abs(vx)*0.4,2.8);
-  const lift =idle?Math.sin(t*1.9)*4.8*tScale:Math.sin(t*8.5)*Math.min(Math.abs(vy)*0.3,3.5);
-  const sx=1+Math.min(Math.abs(vx)*0.014,0.10);
-  const sy=1-Math.min(Math.abs(vx)*0.008+Math.abs(vy)*0.006,0.10);
-  const rot=charBody.angle*0.16+swing*0.028;
-
-  charWrap.style.transform=`translate(-50%,-50%) rotate(${rot}rad)`;
-  // 前面imgのみ変形（後面は透明なので問題なし）
-  frontImg.style.transform=`translate(-50%,calc(-50% + ${lift}px)) perspective(900px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) rotate(${swing*0.36}deg) scaleX(${sx}) scaleY(${sy})`;
-
-  const shadowS=Math.max(0.65,Math.min(1.05,1-Math.abs(y-innerHeight*0.55)/900));
-  charShadow.style.transform=`translateX(-50%) scale(${shadowS})`;
-  charShadow.style.opacity=Math.max(0.3,Math.min(0.85,0.85-Math.abs(vy)*0.022));
-
-  // 通常モードのみスプライト方向切替（他モードは固定スプライト）
-  if(currentMode==='normal'){
-    let next=SPRITES.front;
-    const ax=Math.abs(vx),ay=Math.abs(vy);
-    if(moveTarget){
-      const dx=moveTarget.x-x,dy=moveTarget.y-y;
-      if(Math.abs(dy)>Math.abs(dx)*0.8)next=dy<0?SPRITES.up:SPRITES.down;
-      else next=dx>0?SPRITES.right:SPRITES.left;
-    }else if(ay>ax*1.1&&ay>0.5){next=vy<0?SPRITES.up:SPRITES.down;}
-    else if(ax>0.5){next=vx>0?SPRITES.right:SPRITES.left;}
-
-    if(next===pendingSprite){spriteHold++;}else{pendingSprite=next;spriteHold=0;}
-    if(activeSprite!==pendingSprite&&spriteHold>=SPRITE_HOLD){
-      crossFadeSprite(pendingSprite);
-    }
+  const{x,y}=charBody.position,vx=charBody.velocity.x,vy=charBody.velocity.y;
+  const t=performance.now()*.001,idle=Math.abs(vx)<.4&&Math.abs(vy)<.4;
+  charWrap.style.left=x+'px';charWrap.style.top=y+'px';
+  const tY=Math.max(-14,Math.min(14,vx*2.2)),tX=Math.max(-12,Math.min(12,-vy*1.8));
+  const sw=idle?Math.sin(t*2.1)*2.2:Math.sin(t*8)*Math.min(Math.abs(vx)*.4,2.8);
+  const lf=idle?Math.sin(t*1.9)*4.8:Math.sin(t*8.5)*Math.min(Math.abs(vy)*.3,3.5);
+  const sx=1+Math.min(Math.abs(vx)*.014,.1),sy=1-Math.min(Math.abs(vx)*.008+Math.abs(vy)*.006,.1);
+  charWrap.style.transform=`translate(-50%,-50%) rotate(${charBody.angle*.16+sw*.028}rad)`;
+  frontImg.style.transform=`translate(-50%,calc(-50% + ${lf}px)) perspective(900px) rotateX(${tX}deg) rotateY(${tY}deg) rotate(${sw*.36}deg) scaleX(${sx}) scaleY(${sy})`;
+  const ss=Math.max(.65,Math.min(1.05,1-Math.abs(y-innerHeight*.55)/900));
+  charShadow.style.transform=`translateX(-50%) scale(${ss})`;charShadow.style.opacity=Math.max(.3,Math.min(.85,.85-Math.abs(vy)*.022));
+  // 通常時のみ方向スプライト（ただし idleSpriteCycle が上書きするので移動中のみ）
+  if(currentMode==='normal'&&(Math.abs(vx)>.8||Math.abs(vy)>.8)){
+    let nxt=SP.front;const ax=Math.abs(vx),ay=Math.abs(vy);
+    if(moveTarget){const dx=moveTarget.x-x,dy=moveTarget.y-y;if(Math.abs(dy)>Math.abs(dx)*.8)nxt=dy<0?SP.up:SP.down;else nxt=dx>0?SP.right:SP.left;}
+    else if(ay>ax*1.1&&ay>.5)nxt=vy<0?SP.up:SP.down;else if(ax>.5)nxt=vx>0?SP.right:SP.left;
+    if(nxt===pSpr){sHold++;}else{pSpr=nxt;sHold=0;}
+    if(activeSprite!==pSpr&&sHold>=SHOLD)crossFade(pSpr);
   }
 });
-
-/* まばたき（睡眠中はゆっくり） */
-function doBlink(){
-  gsap.timeline()
-    .to(frontImg,{scaleY:0.07,duration:0.06,ease:'power2.in'})
-    .to(frontImg,{scaleY:1.0,duration:0.1,ease:'power2.out'})
-    .call(()=>setTimeout(doBlink, currentMode==='zzz'?600+Math.random()*800:2200+Math.random()*4000));
-}
+function doBlink(){gsap.timeline().to(frontImg,{scaleY:.07,duration:.06,ease:'power2.in'}).to(frontImg,{scaleY:1,duration:.1,ease:'power2.out'}).call(()=>setTimeout(doBlink,2200+Math.random()*4000));}
 setTimeout(doBlink,2000);
 
 /* ════ 吹き出し ════ */
-function showBubble(text,dur=10000){
-  bubble.textContent=text;bubble.classList.add('show');
-  if(bubbleTimer)clearTimeout(bubbleTimer);
-  bubbleTimer=setTimeout(()=>bubble.classList.remove('show'),dur);
-}
+function showBubble(t,d=10000){bubble.textContent=t;bubble.classList.add('show');if(bubbleTimer)clearTimeout(bubbleTimer);bubbleTimer=setTimeout(()=>bubble.classList.remove('show'),d);}
 
-/* ════ クリックFX ════ */
-function spawnClickFX(x,y){
-  ['cfx','cfx2'].forEach(cls=>{
-    const el=document.createElement('div');el.className=cls;
-    el.style.left=x+'px';el.style.top=y+'px';
-    clickFxWrap.appendChild(el);
-    setTimeout(()=>el.remove(),cls==='cfx'?780:450);
-  });
-}
-function spawnBurst(x,y){
-  for(let i=0;i<10;i++){
-    const dot=document.createElement('div');
-    const ang=(i/10)*Math.PI*2,dist=22+Math.random()*35;
-    dot.style.cssText=`position:fixed;width:${3+Math.random()*3|0}px;height:${3+Math.random()*3|0}px;
-      border-radius:50%;left:${x}px;top:${y}px;transform:translate(-50%,-50%);pointer-events:none;z-index:16;
-      background:rgba(${100+Math.random()*80|0},${180+Math.random()*60|0},255,0.88);
-      box-shadow:0 0 8px rgba(80,180,255,0.7)`;
-    document.body.appendChild(dot);
-    gsap.to(dot,{x:Math.cos(ang)*dist,y:Math.sin(ang)*dist,opacity:0,
-      duration:.45+Math.random()*.25,ease:'power2.out',onComplete:()=>dot.remove()});
-  }
-}
+function spawnClickFX(x,y){['cfx','cfx2'].forEach(c=>{const e=document.createElement('div');e.className=c;e.style.left=x+'px';e.style.top=y+'px';clickFxWrap.appendChild(e);setTimeout(()=>e.remove(),c==='cfx'?780:450);});}
+function spawnBurst(x,y){for(let i=0;i<10;i++){const d=document.createElement('div'),a=(i/10)*Math.PI*2,r=22+Math.random()*35;d.style.cssText=`position:fixed;width:${3+Math.random()*3|0}px;height:${3+Math.random()*3|0}px;border-radius:50%;left:${x}px;top:${y}px;transform:translate(-50%,-50%);pointer-events:none;z-index:16;background:rgba(${100+Math.random()*80|0},${180+Math.random()*60|0},255,.88);box-shadow:0 0 8px rgba(80,180,255,.7)`;document.body.appendChild(d);gsap.to(d,{x:Math.cos(a)*r,y:Math.sin(a)*r,opacity:0,duration:.45+Math.random()*.25,ease:'power2.out',onComplete:()=>d.remove()});}}
+function showGC(msg){taroGC.textContent=msg;taroGC.classList.add('show');taroMini.classList.add('show');if(gcTimer)clearTimeout(gcTimer);gcTimer=setTimeout(()=>{taroGC.classList.remove('show');taroMini.classList.remove('show');},3000);}
 
-/* ════ クリックリアクション ════ */
-function clickReact(ex,ey){
-  onInteract();
-  spawnClickFX(ex,ey);
-  const cx=charBody.position.x,cy=charBody.position.y;
-  const dx=ex-cx,dy=ey-cy;
-  const dist=Math.hypot(dx,dy);
-  const onChar=dist<115;
-
-  // 睡眠中は「むにゃ」しか言わない
-  if(currentMode==='zzz'){
-    if(onChar){
-      showBubble(rand(MODES.zzz.monologue),3000);
-      Body.applyForce(charBody,charBody.position,{x:dx*0.000005,y:-0.003});
-    }
+/* ════ キャラクタークリック（生活モード移行） ════ */
+charClickZone.addEventListener('click',(e)=>{
+  e.stopPropagation();
+  spawnClickFX(e.clientX,e.clientY);
+  if(currentMode!=='normal'){
+    // 生活モード中クリックは専用セリフ
+    const m=LIFE_MODES.find(x=>x.key===currentMode);
+    if(m) showBubble(rnd(m.lines),4000);
+    // ぷよん
+    Body.applyForce(charBody,charBody.position,{x:0,y:-.008});
+    gsap.timeline().to(frontImg,{scaleX:1.18,scaleY:.84,duration:.1,ease:'power3.out'}).to(frontImg,{scaleX:1,scaleY:1,duration:.7,ease:'elastic.out(1.2,.4)'});
     return;
   }
-
-  if(onChar){
-    Body.applyForce(charBody,charBody.position,{x:dx*0.000012,y:dy*0.000012-0.008});
-    spawnBurst(ex,ey);
-    showBubble(taroQuotes[Math.random()*taroQuotes.length|0],5000);
-    moodTxt.textContent=MOODS[Math.random()*MOODS.length|0];
-    statusLine.textContent='😑 押された……なんだな。';
+  // 通常時：40%で生活モード移行
+  if(Math.random()<.40){
+    const m=rnd(LIFE_MODES);
+    applyLifeMode(m);
   }else{
-    const pad=80;
-    moveTarget={
-      x:Math.max(pad,Math.min(innerWidth-pad,ex)),
-      y:Math.max(pad,Math.min(innerHeight-110,ey))
-    };
-    manualBoost=0.2;
-    jumpCooldown=Math.min(jumpCooldown,18);
-    statusLine.textContent=currentMode==='escape'?'🪜 目標に向かうんだな（逃げないんだな）。':'👣 とことこ向かうんだな。';
+    // 通常リアクション
+    Body.applyForce(charBody,charBody.position,{x:(Math.random()-.5)*.0008,y:-.012});
+    gsap.timeline().to(frontImg,{scaleX:1.22,scaleY:.80,duration:.1,ease:'power3.out'}).to(frontImg,{scaleX:.9,scaleY:1.18,duration:.14,ease:'power2.out'}).to(frontImg,{scaleX:1,scaleY:1,duration:.65,ease:'elastic.out(1.2,.4)'});
+    spawnBurst(e.clientX,e.clientY);
+    showBubble(rnd(taroQ),5000);
+    moodTxt.textContent=rnd(MOODS);
   }
-}
+});
 
-/* ════ AI ════ */
+/* 背景クリック→移動 */
+document.addEventListener('pointerdown',e=>{lastPD=performance.now();});
+document.addEventListener('pointerup',e=>{
+  const held=performance.now()-lastPD;
+  const t=e.target;
+  if(t.closest('#composer')||t.closest('#top-bar')||t.closest('.game-overlay')||t.closest('#game-menu')||t.closest('#char-click-zone'))return;
+  if(isDragging||held>250)return;
+  const pad=80;
+  moveTarget={x:Math.max(pad,Math.min(innerWidth-pad,e.clientX)),y:Math.max(pad,Math.min(innerHeight-110,e.clientY))};
+  manualBoost=.2;jumpCooldown=Math.min(jumpCooldown,18);
+  spawnClickFX(e.clientX,e.clientY);
+  statusLine.textContent='👣 とことこ向かうんだな。';
+});
+
+/* AI */
 async function handleSend(){
-  const text=promptInput.value.trim();
-  if(!text||isThinking)return;
-  onInteract();
-  promptInput.value='';autoResize();
-  isThinking=true;sendBtn.disabled=true;
-
-  // 睡眠中でも会話すると起きる
-  if(currentMode==='zzz') applyMode('normal',true);
-
+  const text=promptInput.value.trim();if(!text||isThinking)return;
+  if(currentMode==='zzz')returnToNormal();
+  promptInput.value='';autoResize();isThinking=true;sendBtn.disabled=true;
   showBubble('……考えてるんだな。',8000);
-  statusLine.textContent='💭 どん底で思案中…';
-  const shake=gsap.to(frontImg,{x:2,duration:0.08,yoyo:true,repeat:-1,ease:'none'});
+  const shk=gsap.to(frontImg,{x:2,duration:.08,yoyo:true,repeat:-1,ease:'none'});
   try{
     chatHistory.push({role:'user',text});
-    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message:text,history:chatHistory.slice(-8)})});
+    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,history:chatHistory.slice(-8)})});
     const data=await res.json().catch(()=>({}));
     if(!res.ok)throw new Error(data?.error||'サーバーエラー');
     const reply=(data?.reply||'').trim()||'……なんだな。';
-    chatHistory.push({role:'model',text:reply});
-    shake.kill();gsap.set(frontImg,{x:0});
-    showBubble(reply);
-    statusLine.textContent=MODES[currentMode].status;
-    moodTxt.textContent=MOODS[Math.random()*MOODS.length|0];
-    Body.applyForce(charBody,charBody.position,{x:0,y:-0.022});
-  }catch(err){
-    shake.kill();gsap.set(frontImg,{x:0});
-    showBubble(`うまく喋れないんだな… ${err.message}`);
-    statusLine.textContent='⚠ うまくいかないんだな';
-  }finally{isThinking=false;sendBtn.disabled=false;}
+    chatHistory.push({role:'model',text:reply});shk.kill();gsap.set(frontImg,{x:0});
+    showBubble(reply);moodTxt.textContent=rnd(MOODS);
+    Body.applyForce(charBody,charBody.position,{x:0,y:-.022});
+  }catch(err){shk.kill();gsap.set(frontImg,{x:0});showBubble(`うまく喋れないんだな… ${err.message}`);}
+  finally{isThinking=false;sendBtn.disabled=false;}
 }
 function autoResize(){promptInput.style.height='auto';promptInput.style.height=Math.min(promptInput.scrollHeight,120)+'px';}
+sendBtn.addEventListener('click',handleSend);
+promptInput.addEventListener('input',autoResize);
+promptInput.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();handleSend();}});
+window.addEventListener('resize',()=>{resizeCv();buildWalls();mRender.options.width=innerWidth;mRender.options.height=innerHeight;physCv.width=innerWidth;physCv.height=innerHeight;});
 
 /* ════════════════════════════════════════════
-   どん底四川省 — 完全書き直し二角取り
-   
-   アルゴリズム:
-   ・0曲がり（直線）: 同行 or 同列の障害物チェック
-   ・1曲がり（L字）: 交点(r1,c2)か(r2,c1)が空き
-   ・2曲がり（行橋渡し）: 任意の行rを経由
-   ・2曲がり（列橋渡し）: 任意の列cを経由
-   ・全ケースで「ボード外(-1行/-1列/ROWS列/COLS行)」
-     を経由するパスも探索（端っこから回り込める）
+   ミニゲーム共通ヘルパー
 ════════════════════════════════════════════ */
-const EMOJIS=['🦴','🧱','🍄','👞','📻','🪣','🕳️','🦎','🐛','🕸️','🍂','🔩'];
-const COLS=6,ROWS=4,TILE=54,GAP=5;
+function openOverlay(id){document.getElementById(id).classList.add('active');}
+function closeOverlay(id){document.getElementById(id).classList.remove('active');}
 
-const gameOverlay  =document.getElementById('game-overlay');
-const gameBoard    =document.getElementById('game-board');
-const lineCanvas   =document.getElementById('line-canvas');
-const gameMsg      =document.getElementById('game-msg');
-const movesLeftEl  =document.getElementById('moves-left');
-const pairsLeftEl  =document.getElementById('pairs-left');
-const gameHintBtn  =document.getElementById('game-hint');
-const gameResetBtn =document.getElementById('game-reset');
-const gameCloseBtn =document.getElementById('game-close');
-const taroMiniImg  =document.getElementById('taro-mini-img');
-const taroComment  =document.getElementById('taro-game-comment');
-const lCtx         =lineCanvas.getContext('2d');
+/* ══════════════════════════════════════════════════
+   A. どん底！苔キャッチ
+══════════════════════════════════════════════════ */
+const mossCV=document.getElementById('moss-canvas');
+const mossCtx=mossCV.getContext('2d');
+const MOSSW=400,MOSSH=360;
+let mossRunning=false,mossScore=0,mossLives=3,mossBest=0;
+let mossPlayerX=MOSSW/2,mossVX=0;
+let mossItems=[],mossFrame=0,mossSpawnRate=80;
+let mossKeys={};
 
-let gBoard=[], tileEls=[], selected=null, gMovesLeft=40;
-let gCommentTimer=null, gCommentIdx=0;
-
-/* board[r][c] = タイルタイプ (-1=空き) */
-function getCell(r,c){
-  if(r<0||r>=ROWS||c<0||c>=COLS) return -2; // 範囲外
-  return gBoard[r*COLS+c];
-}
-function isEmpty(r,c){
-  // 範囲外は「通過可能な外部通路」として扱う
-  if(r<0||r>=ROWS||c<0||c>=COLS) return true;
-  return gBoard[r*COLS+c]<0;
-}
-
-/* r行の c1〜c2 間が全て通過可能か（端点を含まない） */
-function clearRow(r,c1,c2){
-  const lo=Math.min(c1,c2)+1, hi=Math.max(c1,c2);
-  for(let c=lo;c<hi;c++) if(!isEmpty(r,c)) return false;
-  return true;
-}
-/* c列の r1〜r2 間が全て通過可能か（端点を含まない） */
-function clearCol(c,r1,r2){
-  const lo=Math.min(r1,r2)+1, hi=Math.max(r1,r2);
-  for(let r=lo;r<hi;r++) if(!isEmpty(r,c)) return false;
-  return true;
+const MOSS_TYPES=[
+  {emoji:'🌿',w:36,h:28,pts:10,bad:false,rare:false},
+  {emoji:'💧',w:20,h:28,pts:5,bad:false,rare:false},
+  {emoji:'🌿',w:36,h:28,pts:10,bad:false,rare:false},
+  {emoji:'💧',w:20,h:28,pts:5,bad:false,rare:false},
+  {emoji:'🪨',w:36,h:30,pts:-1,bad:true,rare:false},
+  {emoji:'🥫',w:36,h:30,pts:-1,bad:true,rare:false},
+  {emoji:'✨',w:40,h:36,pts:50,bad:false,rare:true},// 黄金の苔
+];
+function mossRandItem(){
+  const r=Math.random();
+  if(r<.04) return MOSS_TYPES[6]; // 黄金
+  if(r<.18) return rnd(MOSS_TYPES.slice(4,6)); // 障害物
+  return rnd(MOSS_TYPES.slice(0,2));
 }
 
-/*
-  二角取り経路探索
-  i1, i2: ボード上のインデックス
-  戻り値: [[r,c],...] の経路 (端点含む) または null
-*/
-function findPath(i1,i2){
-  if(i1===i2) return null;
-  if(gBoard[i1]!==gBoard[i2]) return null;
-  const r1=Math.floor(i1/COLS), c1=i1%COLS;
-  const r2=Math.floor(i2/COLS), c2=i2%COLS;
+document.getElementById('moss-start').addEventListener('click',startMoss);
+document.getElementById('moss-close').addEventListener('click',()=>{mossRunning=false;closeOverlay('moss-overlay');});
+document.addEventListener('keydown',e=>{mossKeys[e.key]=true;});
+document.addEventListener('keyup',e=>{mossKeys[e.key]=false;});
+// タッチ操作
+let touchStartX=0;
+mossCV.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;e.preventDefault();},{passive:false});
+mossCV.addEventListener('touchmove',e=>{
+  const dx=e.touches[0].clientX-touchStartX;
+  mossVX=dx*.12; touchStartX=e.touches[0].clientX;e.preventDefault();
+},{passive:false});
 
-  /* ── 0曲がり ── */
-  if(r1===r2 && clearRow(r1,c1,c2)) return [[r1,c1],[r2,c2]];
-  if(c1===c2 && clearCol(c1,r1,r2)) return [[r1,c1],[r2,c2]];
+function startMoss(){
+  mossScore=0;mossLives=3;mossRunning=true;mossItems=[];mossFrame=0;mossSpawnRate=80;
+  mossPlayerX=MOSSW/2;mossVX=0;
+  document.getElementById('moss-msg').textContent='左右キー or スワイプで移動！';
+  requestAnimationFrame(mossTick);
+}
+function mossTick(){
+  if(!mossRunning){mossCtx.clearRect(0,0,MOSSW,MOSSH);return;}
+  mossFrame++;
+  // 入力
+  if(mossKeys['ArrowLeft']||mossKeys['a'])mossVX-=.8;
+  if(mossKeys['ArrowRight']||mossKeys['d'])mossVX+=.8;
+  mossVX*=.82;
+  mossPlayerX=Math.max(30,Math.min(MOSSW-30,mossPlayerX+mossVX));
+  // スポーン
+  const sr=Math.max(35,mossSpawnRate-Math.floor(mossFrame/400)*3);
+  if(mossFrame%sr===0)mossItems.push({...mossRandItem(),x:20+Math.random()*(MOSSW-40),y:-30,vy:1.5+Math.random()*1.5+(mossFrame/800)});
+  // 更新・衝突
+  mossItems=mossItems.filter(it=>{
+    it.y+=it.vy;
+    if(it.y>MOSSH+40) return false;
+    const dx=Math.abs(it.x-mossPlayerX),dy=Math.abs(it.y-(MOSSH-34));
+    if(dx<32&&dy<28){
+      if(it.bad){mossLives--;if(mossLives<=0){mossOver();return false;}spawnClickFX(mossCV.getBoundingClientRect().left+mossPlayerX,mossCV.getBoundingClientRect().top+MOSSH-34);}
+      else{mossScore+=it.pts;if(it.rare)showGC('黄金の苔だんだな！！');}
+      return false;
+    }
+    return true;
+  });
+  // 描画
+  mossCtx.clearRect(0,0,MOSSW,MOSSH);
+  // 背景グラデ
+  const bg=mossCtx.createLinearGradient(0,0,0,MOSSH);bg.addColorStop(0,'#030508');bg.addColorStop(1,'#050d18');
+  mossCtx.fillStyle=bg;mossCtx.fillRect(0,0,MOSSW,MOSSH);
+  // プレイヤー
+  mossCtx.font='38px serif';mossCtx.textAlign='center';
+  mossCtx.fillText('🫧',mossPlayerX,MOSSH-14);
+  // アイテム
+  mossItems.forEach(it=>{
+    mossCtx.font=(it.rare?'32px':'26px')+' serif';
+    if(it.rare){mossCtx.shadowColor='rgba(255,220,80,.9)';mossCtx.shadowBlur=14;}
+    mossCtx.fillText(it.emoji,it.x,it.y);mossCtx.shadowBlur=0;
+  });
+  // UI
+  mossCtx.fillStyle='rgba(160,220,255,.85)';mossCtx.font='bold 13px sans-serif';mossCtx.textAlign='left';
+  mossCtx.fillText(`Score: ${mossScore}`,10,20);
+  mossCtx.textAlign='right';mossCtx.fillText('❤️'.repeat(mossLives),MOSSW-10,20);
+  document.getElementById('moss-info-txt').textContent=`スコア:${mossScore} / 最高:${mossBest}`;
+  requestAnimationFrame(mossTick);
+}
+function mossOver(){
+  mossRunning=false;
+  if(mossScore>mossBest)mossBest=mossScore;
+  mossCtx.fillStyle='rgba(0,0,0,.6)';mossCtx.fillRect(0,0,MOSSW,MOSSH);
+  mossCtx.fillStyle='#7dc8ff';mossCtx.font='bold 22px sans-serif';mossCtx.textAlign='center';
+  mossCtx.fillText('苔を食べすぎたんだな…',MOSSW/2,MOSSH/2-20);
+  mossCtx.fillStyle='rgba(160,220,255,.8)';mossCtx.font='16px sans-serif';
+  mossCtx.fillText(`スコア: ${mossScore}点  最高: ${mossBest}点`,MOSSW/2,MOSSH/2+16);
+  document.getElementById('moss-msg').textContent='もう一度やるんだな？→スタートボタン';
+  showGC('苔が当たったんだな…');
+}
 
-  /* ── 1曲がり (L字) ──
-     交点候補は (r1,c2) と (r2,c1)
-     交点は空きでなければならない（自分自身は除く） */
-  // 交点 (r1,c2)
-  if(isEmpty(r1,c2) && clearRow(r1,c1,c2) && clearCol(c2,r1,r2))
-    return [[r1,c1],[r1,c2],[r2,c2]];
-  // 交点 (r2,c1)
-  if(isEmpty(r2,c1) && clearCol(c1,r1,r2) && clearRow(r2,c1,c2))
-    return [[r1,c1],[r2,c1],[r2,c2]];
+/* ══════════════════════════════════════════════════
+   B. 脱出！連打クライミング
+══════════════════════════════════════════════════ */
+const climbChar=document.getElementById('climb-char');
+const climbProg=document.getElementById('climb-progress');
+const climbCur=document.getElementById('climb-cur');
+const climbBest=document.getElementById('climb-best');
+const climbStatus=document.getElementById('climb-status');
+let climbH=0,climbMax=0,climbBestV=0,climbRunning=false,climbFallTimer=null;
+let climbDecay=null;
+const SHAFT_H=300;
 
-  /* ── 2曲がり ──
-     パターンA: 行rを橋として使う
-       (r1,c1)→(r,c1)→(r,c2)→(r2,c2)
-     パターンB: 列cを橋として使う
-       (r1,c1)→(r1,c)→(r2,c)→(r2,c2)
-     
-     ※ rやcはボード外(-1 や ROWS/COLS)も含めて探索する
-  */
-
-  // パターンA: 行橋 (r = -1 〜 ROWS でスキャン)
-  for(let r=-1;r<=ROWS;r++){
-    // 曲がり点2つが通過可能か
-    if(!isEmpty(r,c1)||!isEmpty(r,c2)) continue;
-    // 各区間が通れるか
-    if(clearCol(c1,r1,r) && clearRow(r,c1,c2) && clearCol(c2,r,r2))
-      return [[r1,c1],[r,c1],[r,c2],[r2,c2]];
+document.getElementById('climb-btn').addEventListener('pointerdown',doClimb);
+function doClimb(){
+  if(!climbRunning){
+    climbRunning=true;climbH=0;climbMax=0;climbStatus.textContent='登ってるんだな！（どうせ落ちる）';
+    clearInterval(climbDecay);climbDecay=setInterval(()=>{
+      climbH=Math.max(0,climbH-.4);
+      if(climbH<1&&climbRunning){
+        climbRunning=false;clearInterval(climbDecay);
+        climbStatus.textContent='手が滑ったんだな…（予定通り）';
+        if(climbMax>climbBestV){climbBestV=climbMax;climbBest.textContent=climbBestV;}
+        showGC('やっぱり落ちたんだな…');
+        gsap.to(climbChar,{bottom:10,duration:.4,ease:'bounce.out'});
+      }
+      updateClimbUI();
+    },80);
+    // 15〜25秒で強制落下
+    if(climbFallTimer)clearTimeout(climbFallTimer);
+    climbFallTimer=setTimeout(()=>{climbH=0;climbRunning=false;clearInterval(climbDecay);climbStatus.textContent='手が滑ったんだな…（やっぱりな）';if(climbMax>climbBestV){climbBestV=climbMax;climbBest.textContent=climbBestV;}showGC('どうせ落ちるんだな。');updateClimbUI();},15000+Math.random()*10000);
   }
+  climbH=Math.min(100,climbH+3.5);
+  climbMax=Math.max(climbMax,climbH);
+  updateClimbUI();
+}
+function updateClimbUI(){
+  const pct=climbH/100;
+  const bot=10+pct*(SHAFT_H-80);
+  climbChar.style.bottom=bot+'px';
+  climbProg.style.height=bot+'px';
+  const m=Math.round(climbH*.5);climbCur.textContent=m;
+  document.getElementById('climb-info').textContent=`高さ: ${m}m`;
+}
 
-  // パターンB: 列橋 (c = -1 〜 COLS でスキャン)
-  for(let c=-1;c<=COLS;c++){
-    if(!isEmpty(r1,c)||!isEmpty(r2,c)) continue;
-    if(clearRow(r1,c1,c) && clearCol(c,r1,r2) && clearRow(r2,c,c2))
-      return [[r1,c1],[r1,c],[r2,c],[r2,c2]];
+/* ══════════════════════════════════════════════════
+   C. ガラクタ鑑定
+══════════════════════════════════════════════════ */
+const JUNK_DB=[
+  {emoji:'🦴',name:'謎の骨',desc:'なんかの骨なんだな。食べてないんだな（たぶん）。',val:0},
+  {emoji:'📻',name:'壊れたラジオ',desc:'電波は拾えないんだな。でも存在感はある。',val:1},
+  {emoji:'🔩',name:'サビたボルト',desc:'どこかのネジなんだな。どこかは分からないんだな。',val:0},
+  {emoji:'👞',name:'片方だけの靴',desc:'もう片方は遠い場所にあるかもね。',val:0},
+  {emoji:'🪣',name:'底が抜けたバケツ',desc:'水が入れられないんだな。でも気持ちは入るかもね。',val:1},
+  {emoji:'🕸️',name:'クモの巣のかたまり',desc:'芸術作品かもね。0円でも1円でも困るんだな。',val:0},
+  {emoji:'🍂',name:'朽ちた落ち葉',desc:'かつては緑だったんだな。僕みたいなんだな。',val:0},
+  {emoji:'🧱',name:'欠けたレンガ',desc:'何かを守っていたんだな。今は何も守ってないんだな。',val:1},
+  {emoji:'📎',name:'錆びたペーパークリップ',desc:'書類なんてないんだな。でも捨てないんだな。',val:0},
+  {emoji:'🕯️',name:'使いかけのロウソク',desc:'灯りになったんだな。もう灯りにはなれないんだな。',val:1},
+  {emoji:'🧲',name:'弱くなった磁石',desc:'何も引き寄せないんだな。僕と同じなんだな。',val:0},
+  {emoji:'🪨',name:'井戸の底の石',desc:'ここにずっといるんだな。よく知ってるんだな。',val:0},
+  {emoji:'🐚',name:'割れた貝殻',desc:'海なんて知らないんだな。でもここにあるんだな。',val:1},
+  {emoji:'🔑',name:'何も開かない鍵',desc:'対応する錠前は存在しないんだな（廃番）。',val:0},
+  {emoji:'📦',name:'潰れた空箱',desc:'中身は不明なんだな。もしかしたら希望だったかもね。',val:1},
+];
+let junkCorrect=0,junkStreak=0,junkCollection=new Set(),junkCurrent=null,junkWaiting=false;
+
+function nextJunk(){
+  junkCurrent=rnd(JUNK_DB);junkWaiting=false;
+  document.getElementById('junk-emoji').textContent=junkCurrent.emoji;
+  document.getElementById('junk-item-name').textContent=junkCurrent.name;
+  document.getElementById('junk-item-desc').textContent=junkCurrent.desc;
+  document.getElementById('junk-result').textContent='';
+  document.getElementById('junk-zero').disabled=false;
+  document.getElementById('junk-one').disabled=false;
+}
+function judgeJunk(ans){
+  if(junkWaiting||!junkCurrent)return;junkWaiting=true;
+  const ok=ans===junkCurrent.val;
+  document.getElementById('junk-zero').disabled=true;document.getElementById('junk-one').disabled=true;
+  if(ok){
+    junkCorrect++;junkStreak++;junkCollection.add(junkCurrent.emoji);
+    document.getElementById('junk-result').innerHTML=`<span style="color:#7eeab0">正解なんだな！ +${junkStreak>=3?'コンボ🔥':''}</span>`;
+    showGC(junkStreak>=3?'連続正解…なんだな。すごくないんだな。':'まあ正解なんだな。');
+  }else{
+    junkStreak=0;
+    document.getElementById('junk-result').innerHTML=`<span style="color:#ff8080">ハズレなんだな… 正解は${junkCurrent.val}円</span>`;
+    showGC('間違えたんだな。まあどうでもいいんだな。');
   }
-
-  return null;
+  document.getElementById('junk-correct').textContent=junkCorrect;
+  document.getElementById('junk-streak').textContent=junkStreak;
+  renderJunkCollection();
+  setTimeout(nextJunk,1600);
 }
-
-/* ── 線描画 ── */
-function tileCenter(r,c){
-  // ボード外の場合はボード端の外側に座標を置く
-  const bx=Math.max(-1,Math.min(c,COLS));
-  const by=Math.max(-1,Math.min(r,ROWS));
-  return{
-    x: bx*(TILE+GAP)+TILE/2,
-    y: by*(TILE+GAP)+TILE/2
-  };
+function renderJunkCollection(){
+  const c=document.getElementById('junk-collection');c.innerHTML='';
+  junkCollection.forEach(e=>{const d=document.createElement('div');d.className='junk-badge';d.textContent=e;d.title='発見済み';c.appendChild(d);});
 }
-function drawPath(path){
-  lCtx.clearRect(0,0,lineCanvas.width,lineCanvas.height);
-  if(!path||path.length<2) return;
-  lCtx.beginPath();
-  const s=tileCenter(path[0][0],path[0][1]);
-  lCtx.moveTo(s.x,s.y);
-  for(let i=1;i<path.length;i++){
-    const p=tileCenter(path[i][0],path[i][1]);
-    lCtx.lineTo(p.x,p.y);
-  }
-  lCtx.strokeStyle='rgba(100,215,255,0.92)';
-  lCtx.lineWidth=3;lCtx.lineCap='round';lCtx.lineJoin='round';
-  lCtx.shadowColor='rgba(80,195,255,0.75)';lCtx.shadowBlur=10;
-  lCtx.stroke();lCtx.shadowBlur=0;
-}
+document.getElementById('junk-zero').addEventListener('click',()=>judgeJunk(0));
+document.getElementById('junk-one').addEventListener('click',()=>judgeJunk(1));
 
-/* ── ヒント ── */
-function findHint(){
-  for(let i=0;i<ROWS*COLS-1;i++){
-    if(gBoard[i]<0) continue;
-    for(let j=i+1;j<ROWS*COLS;j++){
-      if(gBoard[j]<0) continue;
-      if(gBoard[i]===gBoard[j]&&findPath(i,j)) return[i,j];
+/* ══════════════════════════════════════════════════
+   D. どん底リズム：滴のしらべ
+══════════════════════════════════════════════════ */
+const rShaft=document.getElementById('rhythm-shaft');
+const rEcho=document.getElementById('rhythm-echo');
+let rRunning=false,rScore=0,rCombo=0,rBestCombo=0,rHiScore=0;
+let rDrops=[],rFrame=0,rSpawnTimer=null;
+const SHAFT_W=280,SHAFT_HH=320,HIT_Y=SHAFT_HH-52,HIT_RANGE=30;
+let rAnimId=null;
+
+function startRhythm(){
+  rRunning=true;rScore=0;rCombo=0;rDrops=[];rFrame=0;
+  clearTimeout(rSpawnTimer);scheduleRhythmDrop();
+  if(rAnimId)cancelAnimationFrame(rAnimId);
+  rLoop();
+  document.getElementById('r-start').textContent='リセット';
+}
+function scheduleRhythmDrop(){
+  if(!rRunning)return;
+  const delay=600+Math.random()*1400;
+  rSpawnTimer=setTimeout(()=>{
+    rDrops.push({x:40+Math.random()*(SHAFT_W-80),y:-10,vy:1.8+Math.random()*.8,r:8+Math.random()*6,hit:false,miss:false,age:0});
+    scheduleRhythmDrop();
+  },delay);
+}
+function rLoop(){
+  rFrame++;
+  rDrops.forEach(d=>{d.y+=d.vy;d.age++;if(d.y>SHAFT_HH+20&&!d.hit){d.miss=true;}});
+  rDrops=rDrops.filter(d=>{
+    if(d.miss&&d.age>30){if(d.hit===false){rCombo=0;updateRhythmUI();}return false;}
+    return d.y<SHAFT_HH+30;
+  });
+  renderRhythm();
+  if(rRunning)rAnimId=requestAnimationFrame(rLoop);
+}
+function renderRhythm(){
+  // CSS-based: draw with DOM isn't ideal, use canvas approach in shaft
+  // Already using DOM shaft — skip canvas, just update existing r-drops
+  // Clear old drop divs
+  rShaft.querySelectorAll('.r-drop').forEach(e=>e.remove());
+  rDrops.forEach(d=>{
+    const el=document.createElement('div');el.className='r-drop';
+    const col=d.hit?'rgba(120,255,180,.9)':'rgba(80,180,255,.85)';
+    el.style.cssText=`left:${d.x}px;top:${d.y}px;width:${d.r*2}px;height:${d.r*2}px;background:${col};transform:translate(-50%,-50%);box-shadow:0 0 ${d.r+4}px ${col}`;
+    rShaft.appendChild(el);
+  });
+}
+function doRhythmTap(){
+  if(!rRunning)return;
+  // 当たり判定
+  let hit=false;
+  for(const d of rDrops){
+    if(d.hit)continue;
+    if(d.y>HIT_Y-HIT_RANGE&&d.y<HIT_Y+HIT_RANGE){
+      d.hit=true;hit=true;rCombo++;rScore+=10*Math.max(1,Math.floor(rCombo/3));
+      rBestCombo=Math.max(rBestCombo,rCombo);rHiScore=Math.max(rHiScore,rScore);
+      // エコー演出
+      gsap.fromTo(rEcho,{opacity:1,scale:.5},{opacity:0,scale:2,duration:.6,ease:'power2.out'});
+      break;
     }
   }
+  if(!hit){rCombo=0;}
+  updateRhythmUI();
+  spawnClickFX(rShaft.getBoundingClientRect().left+SHAFT_W/2,rShaft.getBoundingClientRect().top+HIT_Y);
+}
+function updateRhythmUI(){
+  document.getElementById('r-combo').textContent=rCombo;
+  document.getElementById('r-score').textContent=rScore;
+  document.getElementById('r-best').textContent=rBestCombo;
+  document.getElementById('r-hi').textContent=rHiScore;
+}
+document.getElementById('rhythm-btn').addEventListener('click',doRhythmTap);
+document.getElementById('rhythm-btn').addEventListener('keydown',e=>{if(e.key===' ')doRhythmTap();});
+document.getElementById('r-start').addEventListener('click',startRhythm);
+
+/* ══════════════════════════════════════════════════
+   四川省（完全二角取り版）
+══════════════════════════════════════════════════ */
+const EMOJIS=['🦴','🧱','🍄','👞','📻','🪣','🕳️','🦎','🐛','🕸️','🍂','🔩'];
+const COLS=6,ROWS=4,TILE=54,GAP=5;
+const mjBoard=document.getElementById('mahjong-board');
+const mjLC=document.getElementById('mj-line-canvas');
+const mjLCtx=mjLC.getContext('2d');
+let gB=[],tEls=[],gSel=null,gMv=40;
+
+function gEmpty(r,c){if(r<0||r>=ROWS||c<0||c>=COLS)return true;return gB[r*COLS+c]<0;}
+function gClearRow(r,c1,c2){const lo=Math.min(c1,c2)+1,hi=Math.max(c1,c2);for(let c=lo;c<hi;c++)if(!gEmpty(r,c))return false;return true;}
+function gClearCol(c,r1,r2){const lo=Math.min(r1,r2)+1,hi=Math.max(r1,r2);for(let r=lo;r<hi;r++)if(!gEmpty(r,c))return false;return true;}
+function gFindPath(i1,i2){
+  if(i1===i2||gB[i1]!==gB[i2])return null;
+  const r1=Math.floor(i1/COLS),c1=i1%COLS,r2=Math.floor(i2/COLS),c2=i2%COLS;
+  if(r1===r2&&gClearRow(r1,c1,c2))return[[r1,c1],[r2,c2]];
+  if(c1===c2&&gClearCol(c1,r1,r2))return[[r1,c1],[r2,c2]];
+  if(gEmpty(r1,c2)&&gClearRow(r1,c1,c2)&&gClearCol(c2,r1,r2))return[[r1,c1],[r1,c2],[r2,c2]];
+  if(gEmpty(r2,c1)&&gClearCol(c1,r1,r2)&&gClearRow(r2,c1,c2))return[[r1,c1],[r2,c1],[r2,c2]];
+  for(let r=-1;r<=ROWS;r++){if(!gEmpty(r,c1)||!gEmpty(r,c2))continue;if(gClearCol(c1,r1,r)&&gClearRow(r,c1,c2)&&gClearCol(c2,r,r2))return[[r1,c1],[r,c1],[r,c2],[r2,c2]];}
+  for(let c=-1;c<=COLS;c++){if(!gEmpty(r1,c)||!gEmpty(r2,c))continue;if(gClearRow(r1,c1,c)&&gClearCol(c,r1,r2)&&gClearRow(r2,c,c2))return[[r1,c1],[r1,c],[r2,c],[r2,c2]];}
   return null;
 }
-
-/* ── ボード生成 ── */
-function makeBoard(){
-  const types=[];
-  for(let i=0;i<12;i++) types.push(i,i);
-  for(let i=types.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [types[i],types[j]]=[types[j],types[i]];
-  }
-  gBoard=types.slice();
+function gTileCenter(r,c){return{x:c*(TILE+GAP)+TILE/2,y:r*(TILE+GAP)+TILE/2};}
+function gDrawPath(path){
+  mjLCtx.clearRect(0,0,mjLC.width,mjLC.height);if(!path||path.length<2)return;
+  mjLCtx.beginPath();const s=gTileCenter(path[0][0],path[0][1]);mjLCtx.moveTo(s.x,s.y);
+  for(let i=1;i<path.length;i++){const p=gTileCenter(path[i][0],path[i][1]);mjLCtx.lineTo(p.x,p.y);}
+  mjLCtx.strokeStyle='rgba(100,215,255,.92)';mjLCtx.lineWidth=3;mjLCtx.lineCap='round';mjLCtx.lineJoin='round';mjLCtx.shadowColor='rgba(80,195,255,.75)';mjLCtx.shadowBlur=10;mjLCtx.stroke();mjLCtx.shadowBlur=0;
 }
-
-function updateInfo(){
-  gMovesLeft=Math.max(0,gMovesLeft);
-  movesLeftEl.textContent=gMovesLeft;
-  pairsLeftEl.textContent=gBoard.filter(v=>v>=0).length/2|0;
+function gFindHint(){for(let i=0;i<ROWS*COLS-1;i++){if(gB[i]<0)continue;for(let j=i+1;j<ROWS*COLS;j++){if(gB[j]<0)continue;if(gB[i]===gB[j]&&gFindPath(i,j))return[i,j];}}return null;}
+function gMakeBoard(){const t=[];for(let i=0;i<12;i++)t.push(i,i);for(let i=t.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[t[i],t[j]]=[t[j],t[i]];}gB=t.slice();}
+function gRender(){
+  const bw=COLS*(TILE+GAP)-GAP,bh=ROWS*(TILE+GAP)-GAP;
+  mjBoard.style.gridTemplateColumns=`repeat(${COLS},${TILE}px)`;
+  mjLC.width=bw;mjLC.height=bh;mjLCtx.clearRect(0,0,bw,bh);
+  tEls.forEach(e=>e.remove());tEls=[];
+  gB.forEach((v,idx)=>{const el=document.createElement('div');el.className='tile'+(v<0?' empty':'');el.textContent=v>=0?EMOJIS[v%EMOJIS.length]:'';if(v>=0)el.addEventListener('click',()=>gOnTile(idx));mjBoard.appendChild(el);tEls.push(el);});
+  gUpdateInfo();
 }
-
-/* ── タイル描画 ── */
-function renderBoard(){
-  const bw=COLS*(TILE+GAP)-GAP, bh=ROWS*(TILE+GAP)-GAP;
-  gameBoard.style.gridTemplateColumns=`repeat(${COLS},${TILE}px)`;
-  lineCanvas.width=bw; lineCanvas.height=bh;
-  lCtx.clearRect(0,0,bw,bh);
-  tileEls.forEach(el=>el.remove()); tileEls=[];
-  gBoard.forEach((v,idx)=>{
-    const el=document.createElement('div');
-    el.className='tile'+(v<0?' empty':'');
-    el.textContent=v>=0?EMOJIS[v%EMOJIS.length]:'';
-    if(v>=0) el.addEventListener('click',()=>onTile(idx));
-    gameBoard.appendChild(el);
-    tileEls.push(el);
-  });
-  updateInfo();
-}
-
-/* ── タイル操作 ── */
-function clearHint(){tileEls.forEach(el=>el.style.boxShadow='');}
-
-function onTile(idx){
-  if(gBoard[idx]<0) return;
-  if(selected===null){
-    selected=idx; tileEls[idx].classList.add('selected'); clearHint(); return;
-  }
-  if(selected===idx){
-    tileEls[idx].classList.remove('selected'); selected=null;
-    lCtx.clearRect(0,0,lineCanvas.width,lineCanvas.height); return;
-  }
-  const path=findPath(selected,idx);
+function gUpdateInfo(){document.getElementById('mj-moves').textContent=gMv;document.getElementById('mj-pairs').textContent=gB.filter(v=>v>=0).length/2|0;}
+function gClearHint(){tEls.forEach(e=>e.style.boxShadow='');}
+function gOnTile(idx){
+  if(gB[idx]<0)return;
+  if(gSel===null){gSel=idx;tEls[idx].classList.add('selected');gClearHint();return;}
+  if(gSel===idx){tEls[idx].classList.remove('selected');gSel=null;mjLCtx.clearRect(0,0,mjLC.width,mjLC.height);return;}
+  const path=gFindPath(gSel,idx);
   if(path){
-    drawPath(path);
-    const s=selected,t=idx; selected=null;
-    tileEls[s].classList.add('flash'); tileEls[t].classList.add('flash');
-    gMovesLeft--;
-    setTimeout(()=>{
-      gBoard[s]=-1; gBoard[t]=-1;
-      tileEls[s].textContent=''; tileEls[s].className='tile empty'; tileEls[s].style.boxShadow='';
-      tileEls[t].textContent=''; tileEls[t].className='tile empty'; tileEls[t].style.boxShadow='';
-      lCtx.clearRect(0,0,lineCanvas.width,lineCanvas.height);
-      updateInfo(); checkEnd(); showGComment();
-    },420);
-  }else{
-    tileEls[selected].classList.remove('selected');
-    selected=idx; tileEls[idx].classList.add('selected');
-    lCtx.clearRect(0,0,lineCanvas.width,lineCanvas.height);
-    setGMsg('繋がらないんだな……。');
-    setTimeout(()=>setGMsg('同じガラクタを2曲がり以内で結んで消すんだな。'),1400);
-  }
+    gDrawPath(path);const s=gSel,t=idx;gSel=null;gMv--;
+    tEls[s].classList.add('flash');tEls[t].classList.add('flash');
+    setTimeout(()=>{gB[s]=-1;gB[t]=-1;tEls[s].textContent='';tEls[s].className='tile empty';tEls[t].textContent='';tEls[t].className='tile empty';mjLCtx.clearRect(0,0,mjLC.width,mjLC.height);gUpdateInfo();gCheckEnd();showGC(rnd(GCMT));},420);
+  }else{tEls[gSel].classList.remove('selected');gSel=idx;tEls[idx].classList.add('selected');mjLCtx.clearRect(0,0,mjLC.width,mjLC.height);document.getElementById('mj-msg').textContent='繋がらないんだな……。';setTimeout(()=>document.getElementById('mj-msg').textContent='同じガラクタを2曲がり以内で結んで消すんだな。',1400);}
 }
+function gCheckEnd(){if(gB.every(v=>v<0)){document.getElementById('mj-msg').textContent='全部消えたんだな。……虚しいかもね。';return;}if(gMv<=0){document.getElementById('mj-msg').textContent='手数切れなんだな…。';return;}if(!gFindHint())document.getElementById('mj-msg').textContent='もう消せるペアがないんだな…。';}
+function gStart(){gMv=40;gSel=null;gMakeBoard();gRender();gClearHint();document.getElementById('mj-msg').textContent='同じガラクタを2曲がり以内で結んで消すんだな。';}
 
-function checkEnd(){
-  if(gBoard.every(v=>v<0)){setGMsg('全部消えたんだな。……虚しいかもね。');return;}
-  if(gMovesLeft<=0){setGMsg('手数切れなんだな……やっぱり無駄だったんだな。');return;}
-  if(!findHint()) setGMsg('もう消せるペアがないんだな……。リセットするんだな。');
-}
-function setGMsg(m){gameMsg.textContent=m;}
-function showGComment(){
-  const el=taroComment;
-  el.textContent=GAME_COMMENTS[gCommentIdx++%GAME_COMMENTS.length];
-  el.classList.add('show'); taroMiniImg.classList.add('show');
-  if(gCommentTimer)clearTimeout(gCommentTimer);
-  gCommentTimer=setTimeout(()=>{el.classList.remove('show');taroMiniImg.classList.remove('show');},3000);
-}
+document.getElementById('btn-mahjong').addEventListener('click',()=>{openOverlay('mahjong-overlay');gStart();setTimeout(()=>showGC(rnd(GCMT)),600);});
+document.getElementById('mj-close').addEventListener('click',()=>closeOverlay('mahjong-overlay'));
+document.getElementById('mj-reset').addEventListener('click',gStart);
+document.getElementById('mj-hint').addEventListener('click',()=>{gClearHint();const p=gFindHint();if(!p){document.getElementById('mj-msg').textContent='消せるペアがないんだな。';return;}tEls[p[0]].style.boxShadow='0 0 16px 4px rgba(255,220,80,.85)';tEls[p[1]].style.boxShadow='0 0 16px 4px rgba(255,220,80,.85)';document.getElementById('mj-msg').textContent='黄色く光ってるやつなんだな。';setTimeout(gClearHint,2800);});
 
-function startGame(){
-  gMovesLeft=40; selected=null;
-  makeBoard(); renderBoard(); clearHint();
-  setGMsg('同じガラクタを2曲がり以内で結んで消すんだな。');
-}
-
-cleanupBtn.addEventListener('click',()=>{
-  gameOverlay.classList.add('active'); startGame(); setTimeout(showGComment,600);
-});
-gameCloseBtn.addEventListener('click',()=>{
-  gameOverlay.classList.remove('active');
-  taroMiniImg.classList.remove('show'); taroComment.classList.remove('show');
-  selected=null; lCtx.clearRect(0,0,lineCanvas.width,lineCanvas.height);
-});
-gameResetBtn.addEventListener('click',startGame);
-gameHintBtn.addEventListener('click',()=>{
-  clearHint();
-  const pair=findHint();
-  if(!pair){setGMsg('もう消せるペアがないんだな……。');return;}
-  tileEls[pair[0]].style.boxShadow='0 0 16px 4px rgba(255,220,80,0.85)';
-  tileEls[pair[1]].style.boxShadow='0 0 16px 4px rgba(255,220,80,0.85)';
-  setGMsg('黄色く光ってるやつなんだな。');
-  setTimeout(clearHint,2800);
-});
-
-/* ════ イベント ════ */
-document.addEventListener('pointerdown',e=>{lastPointerDown=performance.now();});
-document.addEventListener('pointerup',e=>{
-  const held=performance.now()-lastPointerDown;
-  const t=e.target;
-  if(t.closest('#composer')||t.closest('#top-bar')||t.closest('#game-overlay')||t.closest('#cleanup-btn'))return;
-  if(isDragging||held>250)return;
-  clickReact(e.clientX,e.clientY);
-});
-promptInput.addEventListener('pointerdown',onInteract);
-sendBtn.addEventListener('click',handleSend);
-promptInput.addEventListener('input',()=>{autoResize();onInteract();});
-promptInput.addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();handleSend();}
-});
-window.addEventListener('resize',()=>{
-  resizeCanvas();buildWalls();
-  mRender.options.width=innerWidth;mRender.options.height=innerHeight;
-  physCanvas.width=innerWidth;physCanvas.height=innerHeight;
-});
+document.getElementById('btn-moss').addEventListener('click',()=>{openOverlay('moss-overlay');});
+document.getElementById('btn-climb').addEventListener('click',()=>{openOverlay('climb-overlay');});
+document.getElementById('btn-junk').addEventListener('click',()=>{openOverlay('junk-overlay');nextJunk();});
+document.getElementById('btn-rhythm').addEventListener('click',()=>{openOverlay('rhythm-overlay');});
+document.getElementById('climb-close').addEventListener('click',()=>{mossRunning=false;closeOverlay('climb-overlay');});
+document.getElementById('junk-close').addEventListener('click',()=>closeOverlay('junk-overlay'));
+document.getElementById('rhythm-close').addEventListener('click',()=>{rRunning=false;clearTimeout(rSpawnTimer);cancelAnimationFrame(rAnimId);closeOverlay('rhythm-overlay');});
 
 /* ════ 起動 ════ */
-// 初回抽選
-rollMode();
-scheduleNextRoll();
-resetIdleTimer();
-
-// 少し経ってから起動メッセージ
-setTimeout(()=>{
-  if(currentMode==='zzz'){
-    showBubble('……むにゃ……',5000);
-  }else{
-    showBubble('どん底井戸太郎なんだな。少しだけ喋るかもね。',8000);
-  }
-},800);
-
-// 定期ひとこと
-setInterval(()=>{
-  if(!isThinking&&!bubble.classList.contains('show')){
-    const m=MODES[currentMode];
-    showBubble(rand(m.monologue),6000);
-  }
-},22000);
+crossFade(SP.front);
+startIdleSpriteCycle();
+setTimeout(()=>showBubble('どん底井戸太郎なんだな。クリックすると何か起こるかもね。',8000),700);
+statusLine.textContent='✅ キャラクターをクリックすると反応するんだな。';
+setInterval(()=>{if(!isThinking&&!bubble.classList.contains('show'))showBubble(rnd(MNLG),5500);},22000);
 
 })();
 </script>
